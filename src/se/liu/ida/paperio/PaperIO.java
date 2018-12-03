@@ -3,9 +3,9 @@ package se.liu.ida.paperio;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 
-public class App extends JFrame{
+public class PaperIO extends JFrame{
 
-    public App(){
+    public PaperIO(){
         initUI();
     }
 
@@ -22,7 +22,7 @@ public class App extends JFrame{
     public static void main(String[] args) {
 
         EventQueue.invokeLater(() -> {
-            App ex = new App();
+            PaperIO ex = new PaperIO();
             ex.setVisible(true);
         });
     }
