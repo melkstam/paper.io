@@ -12,7 +12,7 @@ public class PaperIO extends JFrame{
     private void initUI(){
         add(new Board());
 
-        setSize(800, 600);
+        setSize(1280, 720);
         setResizable(false);
         setTitle("paper.io");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
