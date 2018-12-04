@@ -1,6 +1,7 @@
 package se.liu.ida.paperio;
 
 import javax.swing.JPanel;
+import java.awt.event.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -8,7 +9,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.Color;
-
 
 public class Board extends JPanel {
 
@@ -25,6 +25,8 @@ public class Board extends JPanel {
     public void initBoard(){
 
         //setBackground(Color.BLACK);
+        setFocusable(true);
+        addKeyListener(new TAdapter());
 
         player = new HumanPlayer();
 
@@ -50,6 +52,7 @@ public class Board extends JPanel {
         g.fillRect(player.getX(), player.getY(), player.getSize(), player.getSize());
     }
 
+
     private class ScheduleTask extends TimerTask {
 
         @Override
@@ -57,6 +60,15 @@ public class Board extends JPanel {
             player.move();
             repaint();
         }
+    }
+
+    private class TAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            player.keyPressed(e);
+        }
+
     }
 
 }

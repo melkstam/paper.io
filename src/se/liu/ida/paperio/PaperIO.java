@@ -3,7 +3,7 @@ package se.liu.ida.paperio;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 
-public class PaperIO extends JFrame{
+public class PaperIO extends JFrame {
 
     public PaperIO(){
         initUI();
