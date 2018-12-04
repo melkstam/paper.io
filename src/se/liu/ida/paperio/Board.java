@@ -10,25 +10,34 @@ import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.Color;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Board extends JPanel {
+
+    Tile[][] gameArea = new Tile[100][100];
+    List<HumanPlayer> players = new ArrayList<HumanPlayer>();
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
     private final int PERIOD_INTERVAL = 1000/60;
-
-    private HumanPlayer player;
 
     public Board(){
         initBoard();
     }
 
     public void initBoard(){
+        for(int i = 0; i < gameArea.length; i++){
+            for(int j = 0; j < gameArea[i].length; j++){
+                gameArea[i][j] = new Tile();
+            }
+        }
 
-        //setBackground(Color.BLACK);
+        setBackground(Color.BLACK);
         setFocusable(true);
         addKeyListener(new TAdapter());
 
-        player = new HumanPlayer();
+        players.add(new HumanPlayer());
 
         timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
@@ -45,19 +54,38 @@ public class Board extends JPanel {
         Toolkit.getDefaultToolkit().sync();
     }
 
-
     public void draw(Graphics g){
-        g.setColor(player.getColor());
-        g.drawRect(player.getX(), player.getY(), player.getSize(), player.getSize());
-        g.fillRect(player.getX(), player.getY(), player.getSize(), player.getSize());
+        drawGameArea(g);
+        drawPlayers(g);
     }
+
+    private void drawPlayers(Graphics g){
+        for(Player player : players){
+            g.setColor(player.getColor());
+            g.drawRect(player.getX(), player.getY(), player.getSize(), player.getSize());
+            g.fillRect(player.getX(), player.getY(), player.getSize(), player.getSize());
+        }
+    }
+
+    private void drawGameArea(Graphics g){
+        for(int i = 0; i < gameArea.length; i++){
+            for(int j = 0; j < gameArea[i].length; j++){
+                g.setColor(gameArea[i][j].getColor());
+                //g.drawRect(i * 10, j*10, 10, 10);
+                g.fillRect(i * 10, j*10, 10, 10);
+            }
+        }
+    }
+
 
 
     private class ScheduleTask extends TimerTask {
 
         @Override
         public void run() {
-            player.move();
+            if(players.size() > 0 ) {
+                players.get(0).move();
+            }
             repaint();
         }
     }
@@ -66,7 +94,9 @@ public class Board extends JPanel {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            player.keyPressed(e);
+            if(players.size() > 0) {
+                players.get(0).keyPressed(e);
+            }
         }
 
     }
