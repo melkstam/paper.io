@@ -17,7 +17,7 @@ public class Board extends JPanel {
 
     Tile[][] gameArea = new Tile[100][100];
     List<HumanPlayer> players = new ArrayList<HumanPlayer>();
-    int scale = 10;
+    int scale = 20;
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
@@ -64,7 +64,7 @@ public class Board extends JPanel {
         for(Player player : players){
             g.setColor(player.getColor());
             //g.drawRect(player.getX(), player.getY(), 10, 10);
-            g.fillRect(player.getX() * scale, player.getY() * scale, scale, scale);
+            g.fillRect((getWidth()-scale)/2, (getHeight()-scale)/2, scale, scale);
         }
     }
 
@@ -73,7 +73,7 @@ public class Board extends JPanel {
             for(int j = 0; j < gameArea[i].length; j++){
                 g.setColor(gameArea[i][j].getColor());
                 //g.drawRect(i * 10, j*10, 10, 10);
-                g.fillRect(i * scale, j*scale, scale, scale);
+                g.fillRect((i - players.get(0).getX())*scale +((getWidth()-scale)/2), (j - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
             }
         }
     }
