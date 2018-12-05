@@ -11,7 +11,6 @@ public class PaperIO extends JFrame {
 
     private void initUI(){
         add(new Board());
-
         setSize(1000, 1000);
         setResizable(false);
         setTitle("paper.io");
@@ -20,7 +19,8 @@ public class PaperIO extends JFrame {
     }
 
     public static void main(String[] args) {
-
+        System.setProperty("sun.java2d.opengl", "True");
+        
         EventQueue.invokeLater(() -> {
             PaperIO ex = new PaperIO();
             ex.setVisible(true);

@@ -6,7 +6,6 @@ public interface Player {
 
     public int getX();
     public int getY();
-    public int getSize();
     public Color getColor();
     public void move();
 

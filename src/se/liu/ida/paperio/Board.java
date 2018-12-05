@@ -17,10 +17,11 @@ public class Board extends JPanel {
 
     Tile[][] gameArea = new Tile[100][100];
     List<HumanPlayer> players = new ArrayList<HumanPlayer>();
+    int scale = 10;
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
-    private final int PERIOD_INTERVAL = 1000/60;
+    private final int PERIOD_INTERVAL = 1000/20;
 
     public Board(){
         initBoard();
@@ -37,7 +38,7 @@ public class Board extends JPanel {
         setFocusable(true);
         addKeyListener(new TAdapter());
 
-        players.add(new HumanPlayer());
+        players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
 
         timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
@@ -62,8 +63,8 @@ public class Board extends JPanel {
     private void drawPlayers(Graphics g){
         for(Player player : players){
             g.setColor(player.getColor());
-            g.drawRect(player.getX(), player.getY(), player.getSize(), player.getSize());
-            g.fillRect(player.getX(), player.getY(), player.getSize(), player.getSize());
+            //g.drawRect(player.getX(), player.getY(), 10, 10);
+            g.fillRect(player.getX() * scale, player.getY() * scale, scale, scale);
         }
     }
 
@@ -72,7 +73,7 @@ public class Board extends JPanel {
             for(int j = 0; j < gameArea[i].length; j++){
                 g.setColor(gameArea[i][j].getColor());
                 //g.drawRect(i * 10, j*10, 10, 10);
-                g.fillRect(i * 10, j*10, 10, 10);
+                g.fillRect(i * scale, j*scale, scale, scale);
             }
         }
     }
