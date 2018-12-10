@@ -18,7 +18,7 @@ public class Board extends JPanel {
     Tile[][] gameArea = new Tile[100][100];
     List<Player> players = new ArrayList<>();
     HumanPlayer humanPlayer;
-    int scale = 5;
+    int scale = 10;
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
@@ -42,18 +42,9 @@ public class Board extends JPanel {
 
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
         humanPlayer = (HumanPlayer)players.get(0);
-        for(int i = 0; i < 2; i++){
+        for(int i = 0; i < 5; i++){
             players.add(new BotPlayer(gameArea.length, gameArea[0].length));
         }
-
-        /*
-        Player bot;
-        for(int i = 0; i < 10; i++){
-            bot = new BotPlayer(gameArea.length, gameArea[0].length);
-            bots.add(bot);
-            startingArea(bot);
-        }*/
-
         for(Player player : players){
             startingArea(player);
         }
@@ -64,9 +55,7 @@ public class Board extends JPanel {
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
 
-    public void checkContest(Player player){
 
-    }
 
     /**
      * @param player Player
