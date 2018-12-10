@@ -15,4 +15,6 @@ public interface Player {
 
     public void setTilesContested(Tile t);
     public ArrayList<Tile> getTilesContested();
+
+    public void contestToOwned();
 }

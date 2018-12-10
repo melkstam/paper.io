@@ -15,6 +15,7 @@ public class HumanPlayer implements Player {
     private Color color;
     private ArrayList<Tile> tilesOwned = new ArrayList<Tile>();
     private ArrayList<Tile> tilesContested = new ArrayList<Tile>();
+    private Boolean outsideTerritory = false;
 
     public HumanPlayer(int height, int width){
         this.height = height;
@@ -78,7 +79,17 @@ public class HumanPlayer implements Player {
     @Override
     public void setTilesContested(Tile t) {
         tilesContested.add(t);
+        t.setContestedOwner(this);
         System.out.println(tilesContested.size());
+    }
+
+    @Override
+    public void contestToOwned() {
+        for (Tile t : tilesContested) {
+            t.setOwner(this);
+            System.out.println("Added Tile");
+        }
+        tilesContested.clear();
     }
 
     /**

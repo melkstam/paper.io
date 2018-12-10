@@ -64,6 +64,7 @@ public class Tile {
     public void setOwner(Player owner) {
         this.owner = owner;
         owner.setTilesOwned(this);
+        contestedOwner = null;
     }
 
     public int getxPos() {

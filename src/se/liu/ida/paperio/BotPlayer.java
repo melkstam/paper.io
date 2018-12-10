@@ -101,4 +101,9 @@ public class BotPlayer implements Player{
     public ArrayList<Tile> getTilesContested() {
         return tilesContested;
     }
+
+    @Override
+    public void contestToOwned() {
+
+    }
 }

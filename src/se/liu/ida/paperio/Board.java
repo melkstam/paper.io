@@ -43,12 +43,13 @@ public class Board extends JPanel {
         for(HumanPlayer player : players){
             startingArea(player);
         }
+        /*
         Player bot;
         for(int i = 0; i < 10; i++){
             bot = new BotPlayer(gameArea.length, gameArea[0].length);
             bots.add(bot);
             startingArea(bot);
-        }
+        }*/
 
 
 
@@ -61,8 +62,9 @@ public class Board extends JPanel {
 
     }
 
-    // Sets starting areas for each player
-
+    /**
+     * @param player Player
+     */
     public void startingArea(Player player){
         int x = player.getX();
         int y = player.getY();
@@ -80,9 +82,7 @@ public class Board extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         draw(g);
-
         Toolkit.getDefaultToolkit().sync();
     }
 
@@ -107,7 +107,6 @@ public class Board extends JPanel {
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
                 g.setColor(Color.white);
-                //g.drawRect(i * 10, j*10, 10, 10);
                 g.fillRect((i - players.get(0).getX())*scale +((getWidth()-scale)/2),
                         (j - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
                 g.setColor(gameArea[i][j].getColor());
@@ -130,9 +129,11 @@ public class Board extends JPanel {
             for(Player player : players){
                 try {
                     if (gameArea[player.getX()][player.getY()].getOwner() != player) {
-                        gameArea[player.getX()][player.getY()].setContestedOwner(player);
                         player.setTilesContested(gameArea[player.getX()][player.getY()]);
+                    } else if (gameArea[player.getX()][player.getY()].getOwner() == player){
+                        player.contestToOwned();
                     }
+
                 } catch (ArrayIndexOutOfBoundsException e){
                     System.out.println(e);
                 }
@@ -159,6 +160,5 @@ public class Board extends JPanel {
                 players.get(0).keyPressed(e);
             }
         }
-
     }
 }
