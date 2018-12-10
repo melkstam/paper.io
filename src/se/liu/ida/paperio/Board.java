@@ -39,12 +39,40 @@ public class Board extends JPanel {
         addKeyListener(new TAdapter());
 
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
-
+        for(HumanPlayer player : players){
+            startingArea(player);
+        }
         timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
 
+    public void checkContest(Player player){
+
+    }
+
+    // Sets starting areas for each player
+    public void startingArea(Player player){
+        int x = player.getX();
+        int y = player.getY();
+        gameArea[x-1][y].setOwner(player);
+        gameArea[x][y].setOwner(player);
+        gameArea[x+1][y].setOwner(player);
+        gameArea[x-1][y+1].setOwner(player);
+        gameArea[x-1][y-1].setOwner(player);
+        gameArea[x][y-1].setOwner(player);
+        gameArea[x][y+1].setOwner(player);
+        gameArea[x+1][y-1].setOwner(player);
+        gameArea[x+1][y+1].setOwner(player);
+
+        for(int i = 0; i < 9; i ++){
+            player.setTilesOwned();
+        }
+
+
+
+        //player.setTilesOwned(9);
+    }
 
     @Override
     public void paintComponent(Graphics g) {
@@ -57,8 +85,9 @@ public class Board extends JPanel {
 
     public void draw(Graphics g){
         drawGameArea(g);
+        drawOwnedTiles(g);
         drawPlayers(g);
-    }
+        }
 
     private void drawPlayers(Graphics g){
         for(Player player : players){
@@ -71,14 +100,21 @@ public class Board extends JPanel {
     private void drawGameArea(Graphics g){
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
-                g.setColor(gameArea[i][j].getColor());
+                g.setColor(Color.white);
                 //g.drawRect(i * 10, j*10, 10, 10);
                 g.fillRect(i * scale, j*scale, scale, scale);
             }
         }
     }
 
-
+    public void drawOwnedTiles(Graphics g){
+        for(int i = 0; i < gameArea.length; i++){
+            for(int j = 0; j < gameArea[i].length; j++){
+                g.setColor(gameArea[i][j].getColor());
+                g.fillRect(i * scale, j * scale, scale, scale);
+            }
+        }
+    }
 
     private class ScheduleTask extends TimerTask {
 
@@ -86,6 +122,16 @@ public class Board extends JPanel {
         public void run() {
             if(players.size() > 0 ) {
                 players.get(0).move();
+            }
+            for(Player player : players){
+                try {
+                    if (gameArea[player.getX()][player.getY()].getOwner() != player) {
+                        gameArea[player.getX()][player.getY()].setContestedOwner(player);
+                        player.setTilesOwned();
+                    }
+                } catch (ArrayIndexOutOfBoundsException e){
+                    System.out.println(e);
+                }
             }
             repaint();
         }
@@ -101,5 +147,4 @@ public class Board extends JPanel {
         }
 
     }
-
 }

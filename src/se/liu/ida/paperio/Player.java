@@ -9,4 +9,9 @@ public interface Player {
     public Color getColor();
     public void move();
 
+    public void setTilesOwned();
+    public int[][] getTilesOwned();
+
+    public void setTilesContested();
+    public Tile[][] getTilesContested();
 }
