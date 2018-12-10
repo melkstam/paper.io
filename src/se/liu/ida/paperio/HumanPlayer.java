@@ -2,6 +2,7 @@ package se.liu.ida.paperio;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class HumanPlayer implements Player {
 
@@ -12,69 +13,85 @@ public class HumanPlayer implements Player {
     private int height;
     private int width;
     private Color color;
-    private int[][] tilesOwned;
-    private Tile[][] tilesContested;
+    private ArrayList<Tile> tilesOwned = new ArrayList<Tile>();
+    private ArrayList<Tile> tilesContested = new ArrayList<Tile>();
 
     public HumanPlayer(int height, int width){
         this.height = height;
         this.width = width;
-
         x = (int)(Math.random() * width);
         y = (int)(Math.random() * height);
         color = new Color(255,105,180, 255);
-        tilesOwned = new int[100][100];
-        tilesContested = new Tile[100][100];
     }
 
+    /**
+     * @return X position on the map
+     */
     @Override
     public int getX() {
         return x;
     }
 
+    /**
+     * @return Y position on the map
+     */
     @Override
     public int getY() {
         return y;
     }
 
+    /**
+     * @return Player's color
+     */
     @Override
     public Color getColor() {
         return color;
     }
 
-    @Override
-    public int[][] getTilesOwned() {
-        return this.tilesOwned;
-    }
-
-    @Override
-    public void setTilesOwned() {
-        tilesOwned[getX()][getY()] = 1;
-        int counter = 0;
-
-        for (int i = 0; i < tilesOwned.length; i++){
-            for(int j = 0; j < tilesOwned[i].length; j++){
-                if(tilesOwned[i][j] == 1){
-                    counter++;
-                    System.out.println(counter);
-                }
-            }
-        }
-    }
-
-    @Override
-    public Tile[][] getTilesContested() {
-        return this.tilesContested;
-    }
-
-    @Override
-    public void setTilesContested() {
-    }
-
+    /**
+     * Moves the player in different directions
+     */
     public void move(){
         x += dx;
         y += dy;
     }
 
+    /**
+     * @param t Sets tile as owned
+     */
+    @Override
+    public void setTilesOwned(Tile t) {
+        tilesOwned.add(t);
+    }
+
+    /**
+     * @return List of all Tiles the player owns
+     */
+    @Override
+    public ArrayList<Tile> getTilesOwned() {
+        return null;
+    }
+
+    /**
+     * @param t Tile that is being contested
+     */
+    @Override
+    public void setTilesContested(Tile t) {
+        tilesContested.add(t);
+        System.out.println(tilesContested.size());
+    }
+
+    /**
+     * @return List of all Tiles the player is contesting
+     */
+    @Override
+    public ArrayList<Tile> getTilesContested() {
+        return null;
+    }
+
+    /** Handles player movement controls
+     * @param e Key that is being pressed
+     */
     public void keyPressed(KeyEvent e) {
 
         int key = e.getKeyCode();

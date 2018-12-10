@@ -30,7 +30,7 @@ public class Board extends JPanel {
     public void initBoard(){
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
-                gameArea[i][j] = new Tile();
+                gameArea[i][j] = new Tile(i,j);
             }
         }
 
@@ -52,6 +52,7 @@ public class Board extends JPanel {
     }
 
     // Sets starting areas for each player
+
     public void startingArea(Player player){
         int x = player.getX();
         int y = player.getY();
@@ -64,14 +65,6 @@ public class Board extends JPanel {
         gameArea[x][y+1].setOwner(player);
         gameArea[x+1][y-1].setOwner(player);
         gameArea[x+1][y+1].setOwner(player);
-
-        for(int i = 0; i < 9; i ++){
-            player.setTilesOwned();
-        }
-
-
-
-        //player.setTilesOwned(9);
     }
 
     @Override
@@ -120,7 +113,7 @@ public class Board extends JPanel {
                 try {
                     if (gameArea[player.getX()][player.getY()].getOwner() != player) {
                         gameArea[player.getX()][player.getY()].setContestedOwner(player);
-                        player.setTilesOwned();
+                        player.setTilesContested(gameArea[player.getX()][player.getY()]);
                     }
                 } catch (ArrayIndexOutOfBoundsException e){
                     System.out.println(e);

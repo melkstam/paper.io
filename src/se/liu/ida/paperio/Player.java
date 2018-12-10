@@ -1,6 +1,7 @@
 package se.liu.ida.paperio;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 public interface Player {
 
@@ -9,9 +10,9 @@ public interface Player {
     public Color getColor();
     public void move();
 
-    public void setTilesOwned();
-    public int[][] getTilesOwned();
+    public void setTilesOwned(Tile t);
+    public ArrayList<Tile> getTilesOwned();
 
-    public void setTilesContested();
-    public Tile[][] getTilesContested();
+    public void setTilesContested(Tile t);
+    public ArrayList<Tile> getTilesContested();
 }
