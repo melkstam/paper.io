@@ -16,7 +16,8 @@ import java.util.ArrayList;
 public class Board extends JPanel {
 
     Tile[][] gameArea = new Tile[100][100];
-    List<HumanPlayer> players = new ArrayList<HumanPlayer>();
+    List<HumanPlayer> players = new ArrayList<>();
+    List<Player> bots = new ArrayList<>();
     int scale = 20;
 
     private Timer timer;
@@ -42,6 +43,15 @@ public class Board extends JPanel {
         for(HumanPlayer player : players){
             startingArea(player);
         }
+        Player bot;
+        for(int i = 0; i < 10; i++){
+            bot = new BotPlayer(gameArea.length, gameArea[0].length);
+            bots.add(bot);
+            startingArea(bot);
+        }
+
+
+
         timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
                 INITIAL_DELAY, PERIOD_INTERVAL);
@@ -79,12 +89,17 @@ public class Board extends JPanel {
     public void draw(Graphics g){
         drawGameArea(g);
         drawPlayers(g);
-        }
+    }
 
     private void drawPlayers(Graphics g){
         for(Player player : players){
             g.setColor(player.getColor());
             g.fillRect((getWidth()-scale)/2, (getHeight()-scale)/2, scale, scale);
+        }
+        for(Player bot : bots){
+            g.setColor(bot.getColor());
+            g.fillRect((bot.getX() - players.get(0).getX())*scale +((getWidth()-scale)/2),
+                    (bot.getY() - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
         }
     }
 
@@ -109,11 +124,24 @@ public class Board extends JPanel {
             if(players.size() > 0 ) {
                 players.get(0).move();
             }
+            for(Player bot : bots){
+                bot.move();
+            }
             for(Player player : players){
                 try {
                     if (gameArea[player.getX()][player.getY()].getOwner() != player) {
                         gameArea[player.getX()][player.getY()].setContestedOwner(player);
                         player.setTilesContested(gameArea[player.getX()][player.getY()]);
+                    }
+                } catch (ArrayIndexOutOfBoundsException e){
+                    System.out.println(e);
+                }
+            }
+            for(Player bot : bots){
+                try {
+                    if (gameArea[bot.getX()][bot.getY()].getOwner() != bot) {
+                        gameArea[bot.getX()][bot.getY()].setContestedOwner(bot);
+                        bot.setTilesOwned(gameArea[bot.getX()][bot.getY()]);
                     }
                 } catch (ArrayIndexOutOfBoundsException e){
                     System.out.println(e);
