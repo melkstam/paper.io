@@ -85,14 +85,12 @@ public class Board extends JPanel {
 
     public void draw(Graphics g){
         drawGameArea(g);
-        drawOwnedTiles(g);
         drawPlayers(g);
         }
 
     private void drawPlayers(Graphics g){
         for(Player player : players){
             g.setColor(player.getColor());
-            //g.drawRect(player.getX(), player.getY(), 10, 10);
             g.fillRect((getWidth()-scale)/2, (getHeight()-scale)/2, scale, scale);
         }
     }
@@ -104,13 +102,6 @@ public class Board extends JPanel {
                 //g.drawRect(i * 10, j*10, 10, 10);
                 g.fillRect((i - players.get(0).getX())*scale +((getWidth()-scale)/2),
                         (j - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
-            }
-        }
-    }
-
-    public void drawOwnedTiles(Graphics g){
-        for(int i = 0; i < gameArea.length; i++){
-            for(int j = 0; j < gameArea[i].length; j++){
                 g.setColor(gameArea[i][j].getColor());
                 g.fillRect((i - players.get(0).getX())*scale +((getWidth()-scale)/2),
                         (j - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
