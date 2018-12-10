@@ -94,7 +94,6 @@ public class BotPlayer implements Player{
     @Override
     public void setTilesContested(Tile t) {
         tilesContested.add(t);
-        t.setOwner(this);
     }
 
     @Override
