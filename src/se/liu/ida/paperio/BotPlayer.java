@@ -94,7 +94,7 @@ public class BotPlayer implements Player{
     @Override
     public void setTilesContested(Tile t) {
         tilesContested.add(t);
-        t.setOwner(this);
+        t.setContestedOwner(this);
     }
 
     @Override
@@ -104,6 +104,10 @@ public class BotPlayer implements Player{
 
     @Override
     public void contestToOwned() {
-
+        for (Tile t : tilesContested) {
+            t.setOwner(this);
+            System.out.println("Added Tile");
+        }
+        tilesContested.clear();
     }
 }

@@ -16,9 +16,9 @@ import java.util.ArrayList;
 public class Board extends JPanel {
 
     Tile[][] gameArea = new Tile[100][100];
-    List<HumanPlayer> players = new ArrayList<>();
-    List<Player> bots = new ArrayList<>();
-    int scale = 20;
+    List<Player> players = new ArrayList<>();
+    HumanPlayer humanPlayer;
+    int scale = 5;
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
@@ -39,10 +39,13 @@ public class Board extends JPanel {
         setFocusable(true);
         addKeyListener(new TAdapter());
 
+
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
-        for(HumanPlayer player : players){
-            startingArea(player);
+        humanPlayer = (HumanPlayer)players.get(0);
+        for(int i = 0; i < 2; i++){
+            players.add(new BotPlayer(gameArea.length, gameArea[0].length));
         }
+
         /*
         Player bot;
         for(int i = 0; i < 10; i++){
@@ -51,6 +54,9 @@ public class Board extends JPanel {
             startingArea(bot);
         }*/
 
+        for(Player player : players){
+            startingArea(player);
+        }
 
 
         timer = new Timer();
@@ -94,12 +100,8 @@ public class Board extends JPanel {
     private void drawPlayers(Graphics g){
         for(Player player : players){
             g.setColor(player.getColor());
-            g.fillRect((getWidth()-scale)/2, (getHeight()-scale)/2, scale, scale);
-        }
-        for(Player bot : bots){
-            g.setColor(bot.getColor());
-            g.fillRect((bot.getX() - players.get(0).getX())*scale +((getWidth()-scale)/2),
-                    (bot.getY() - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
+            g.fillRect((player.getX() - humanPlayer.getX())*scale +((getWidth()-scale)/2),
+                    (player.getY() - humanPlayer.getY())*scale +((getHeight()-scale)/2), scale, scale);
         }
     }
 
@@ -107,11 +109,12 @@ public class Board extends JPanel {
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
                 g.setColor(Color.white);
-                g.fillRect((i - players.get(0).getX())*scale +((getWidth()-scale)/2),
-                        (j - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
+                g.fillRect((i - humanPlayer.getX())*scale +((getWidth()-scale)/2),
+                        (j - humanPlayer.getY())*scale +((getHeight()-scale)/2), scale, scale);
+
                 g.setColor(gameArea[i][j].getColor());
-                g.fillRect((i - players.get(0).getX())*scale +((getWidth()-scale)/2),
-                        (j - players.get(0).getY())*scale +((getHeight()-scale)/2), scale, scale);
+                g.fillRect((i - humanPlayer.getX())*scale +((getWidth()-scale)/2),
+                        (j - humanPlayer.getY())*scale +((getHeight()-scale)/2), scale, scale);
             }
         }
     }
@@ -120,13 +123,8 @@ public class Board extends JPanel {
 
         @Override
         public void run() {
-            if(players.size() > 0 ) {
-                players.get(0).move();
-            }
-            for(Player bot : bots){
-                bot.move();
-            }
             for(Player player : players){
+                player.move();
                 try {
                     if (gameArea[player.getX()][player.getY()].getOwner() != player) {
                         player.setTilesContested(gameArea[player.getX()][player.getY()]);
@@ -134,16 +132,6 @@ public class Board extends JPanel {
                         player.contestToOwned();
                     }
 
-                } catch (ArrayIndexOutOfBoundsException e){
-                    System.out.println(e);
-                }
-            }
-            for(Player bot : bots){
-                try {
-                    if (gameArea[bot.getX()][bot.getY()].getOwner() != bot) {
-                        gameArea[bot.getX()][bot.getY()].setContestedOwner(bot);
-                        bot.setTilesOwned(gameArea[bot.getX()][bot.getY()]);
-                    }
                 } catch (ArrayIndexOutOfBoundsException e){
                     System.out.println(e);
                 }
@@ -156,9 +144,7 @@ public class Board extends JPanel {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            if(players.size() > 0) {
-                players.get(0).keyPressed(e);
-            }
+            humanPlayer.keyPressed(e);
         }
     }
 }

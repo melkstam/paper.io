@@ -15,11 +15,11 @@ public class HumanPlayer implements Player {
     private Color color;
     private ArrayList<Tile> tilesOwned = new ArrayList<Tile>();
     private ArrayList<Tile> tilesContested = new ArrayList<Tile>();
-    private Boolean outsideTerritory = false;
 
     public HumanPlayer(int height, int width){
         this.height = height;
         this.width = width;
+
         x = (int)(Math.random() * width);
         y = (int)(Math.random() * height);
         color = new Color(255,105,180, 255);
@@ -70,7 +70,7 @@ public class HumanPlayer implements Player {
      */
     @Override
     public ArrayList<Tile> getTilesOwned() {
-        return null;
+        return tilesOwned;
     }
 
     /**
@@ -97,7 +97,7 @@ public class HumanPlayer implements Player {
      */
     @Override
     public ArrayList<Tile> getTilesContested() {
-        return null;
+        return tilesContested;
     }
 
     /** Handles player movement controls
