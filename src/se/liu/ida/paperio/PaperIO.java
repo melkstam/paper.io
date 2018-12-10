@@ -20,7 +20,7 @@ public class PaperIO extends JFrame {
 
     public static void main(String[] args) {
         System.setProperty("sun.java2d.opengl", "True");
-        
+
         EventQueue.invokeLater(() -> {
             PaperIO ex = new PaperIO();
             ex.setVisible(true);

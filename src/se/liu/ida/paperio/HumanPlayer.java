@@ -18,6 +18,7 @@ public class HumanPlayer implements Player {
     public HumanPlayer(int height, int width){
         this.height = height;
         this.width = width;
+
         x = (int)(Math.random() * width);
         y = (int)(Math.random() * height);
         color = new Color(255,105,180, 255);
