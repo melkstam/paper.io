@@ -22,7 +22,7 @@ public class HumanPlayer extends Player {
     }
 
 
-
+    // TODO Fix so Player only can change directions once per tick
     /** Handles player movement controls
      * @param e Key that is being pressed
      */

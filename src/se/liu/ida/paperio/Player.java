@@ -94,4 +94,10 @@ public abstract class Player {
         }
         tilesContested.clear();
     }
+
+    public void checkCollision(Tile t){
+        if(t.getContestedOwner() != null || t.getContestedOwner() == this){
+            System.out.println("YOU DIEDED");
+        }
+    }
 }

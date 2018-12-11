@@ -35,8 +35,6 @@ public class Tile {
             // If Tile has an owner and is being contested by someone,
             // returns contestedOwner's color with an alpha of 100
         else if (owner != null && contestedOwner != owner){
-            Color clr = new Color(contestedOwner.getColor().getRed(), contestedOwner.getColor().getBlue(),
-                    contestedOwner.getColor().getGreen(), 100);
             return blendColors();
         }else{
             return color;

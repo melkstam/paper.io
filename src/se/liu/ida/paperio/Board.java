@@ -18,11 +18,11 @@ public class Board extends JPanel {
     Tile[][] gameArea = new Tile[100][100];
     List<Player> players = new ArrayList<>();
     HumanPlayer humanPlayer;
-    int scale = 25;
+    int scale = 10;
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
-    private final int PERIOD_INTERVAL = 1000/10;
+    private final int PERIOD_INTERVAL = 1000/20;
 
     public Board(){
         initBoard();
@@ -116,11 +116,11 @@ public class Board extends JPanel {
                 player.move();
                 try {
                     if (gameArea[player.getX()][player.getY()].getOwner() != player) {
+                        player.checkCollision(gameArea[player.getX()][player.getY()]);
                         player.setTilesContested(gameArea[player.getX()][player.getY()]);
                     } else if (gameArea[player.getX()][player.getY()].getOwner() == player){
                         player.contestToOwned();
                     }
-
                 } catch (ArrayIndexOutOfBoundsException e){
                     System.out.println(e);
                 }
