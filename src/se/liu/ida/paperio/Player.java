@@ -59,7 +59,7 @@ public abstract class Player {
      * Add tile to players list of owned tiles
      * @param t Tile to be added to players owned list
      */
-    public void setTilesOwned(Tile t){
+    public void setTileOwned(Tile t){
         tilesOwned.add(t);
         t.setOwner(this);
     }
@@ -76,7 +76,7 @@ public abstract class Player {
      * Add tile to players list of contested tiles
      * @param t Tile to be added to players contested list
      */
-    public void setTilesContested(Tile t){
+    public void setTileContested(Tile t){
         tilesContested.add(t);
         t.setContestedOwner(this);
     }
@@ -94,7 +94,7 @@ public abstract class Player {
      */
     public void contestToOwned(){
         for (Tile t : tilesContested) {
-            t.setOwner(this);
+            setTileOwned(t);
         }
         tilesContested.clear();
     }
@@ -106,6 +106,6 @@ public abstract class Player {
     }
 
     public void death(){
-        System.out.println("You diededed");
+        //System.out.println("You diededed");
     }
 }
