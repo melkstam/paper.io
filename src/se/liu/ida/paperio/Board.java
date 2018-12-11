@@ -12,6 +12,7 @@ import java.awt.Color;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class Board extends JPanel {
 
@@ -23,6 +24,7 @@ public class Board extends JPanel {
     private Timer timer;
     private final int INITIAL_DELAY = 0;
     private final int PERIOD_INTERVAL = 1000/20;
+    private KeyEvent key;
 
     public Board(){
         initBoard();
@@ -42,20 +44,16 @@ public class Board extends JPanel {
 
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
         humanPlayer = (HumanPlayer)players.get(0);
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 20; i++){
             players.add(new BotPlayer(gameArea.length, gameArea[0].length));
         }
         for(Player player : players){
             startingArea(player);
         }
-
-
         timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
-
-
 
     /**
      * @param player Player
@@ -121,8 +119,10 @@ public class Board extends JPanel {
                     } else if (gameArea[player.getX()][player.getY()].getOwner() == player){
                         player.contestToOwned();
                     }
+
                 } catch (ArrayIndexOutOfBoundsException e){
-                    System.out.println(e);
+                    //System.out.println(e);
+                    player.death();
                 }
             }
             repaint();

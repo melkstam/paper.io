@@ -12,12 +12,16 @@ public abstract class Player {
     protected Color color;
     protected ArrayList<Tile> tilesOwned = new ArrayList<>();
     protected ArrayList<Tile> tilesContested = new ArrayList<>();
+    protected int height;
+    protected int width;
 
 
     public Player(int height, int width){
         x = (int)(Math.random() * (width - 2) +1);
         y = (int)(Math.random() * (height - 2) +1);
         color = new Color((int)(Math.random() * 0x1000000));
+        this.height = height;
+        this.width = width;
     }
 
 
@@ -97,7 +101,11 @@ public abstract class Player {
 
     public void checkCollision(Tile t){
         if(t.getContestedOwner() != null || t.getContestedOwner() == this){
-            System.out.println("YOU DIEDED");
+            //System.out.println(this + "DIEDED");
         }
+    }
+
+    public void death(){
+        System.out.println("You diededed");
     }
 }
