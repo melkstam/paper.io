@@ -18,11 +18,11 @@ public class Board extends JPanel {
     Tile[][] gameArea = new Tile[100][100];
     List<Player> players = new ArrayList<>();
     HumanPlayer humanPlayer;
-    int scale = 10;
+    int scale = 25;
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
-    private final int PERIOD_INTERVAL = 1000/20;
+    private final int PERIOD_INTERVAL = 1000/10;
 
     public Board(){
         initBoard();

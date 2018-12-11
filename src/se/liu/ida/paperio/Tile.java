@@ -37,10 +37,20 @@ public class Tile {
         else if (owner != null && contestedOwner != owner){
             Color clr = new Color(contestedOwner.getColor().getRed(), contestedOwner.getColor().getBlue(),
                     contestedOwner.getColor().getGreen(), 100);
-            return clr;
+            return blendColors();
         }else{
             return color;
         }
+    }
+
+    public Color blendColors(){
+        float blendedRed = ((owner.getColor().getRed() / 255f) * (contestedOwner.getColor().getRed() / 255f));
+        float blendedGreen = ((owner.getColor().getGreen() / 255f) * (contestedOwner.getColor().getGreen() / 255f));
+        float blendedBlue = ((owner.getColor().getBlue() / 255f) * (contestedOwner.getColor().getBlue() / 255f));
+
+        Color clr = new Color(((blendedRed + 1 ) / 2),((blendedGreen + 1) / 2),((blendedBlue +1 )/ 2));
+
+        return clr;
     }
 
     /**
