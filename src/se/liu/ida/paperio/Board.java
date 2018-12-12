@@ -17,12 +17,15 @@ public class Board extends JPanel {
     Tile[][] gameArea = new Tile[100][100];
     List<Player> players = new ArrayList<>();
     HumanPlayer humanPlayer;
-    int scale = 25;
+    private final int scale = 25;
+    private int tickCounter = 0;
+    private final int tickReset = 10;
 
     private Timer timer;
     private final int INITIAL_DELAY = 0;
-    private final int PERIOD_INTERVAL = 1000/20;
-    private KeyEvent key;
+    private final int PERIOD_INTERVAL = 1000/60;
+    private KeyEvent keyToSend;
+
 
     public Board(){
         initBoard();
@@ -42,7 +45,7 @@ public class Board extends JPanel {
 
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
         humanPlayer = (HumanPlayer)players.get(0);
-        for(int i = 0; i < 0; i++){
+        for(int i = 0; i < 5; i++){
             players.add(new BotPlayer(gameArea.length, gameArea[0].length));
         }
         for(Player player : players){
@@ -84,7 +87,6 @@ public class Board extends JPanel {
 
     // TODO Draw a live scoreboard
     // TODO Ask for name and print name under player
-    // TODO Make movement smooth (several ticks between getting from one tile to the next)
     /**
      * Main method responsible for drawing everything to the screen
      * @param g Graphics object gotten as argument in paintComponent method
@@ -92,28 +94,6 @@ public class Board extends JPanel {
     public void draw(Graphics g){
         drawGameArea(g);
         drawPlayers(g);
-    }
-
-    /**
-     * Draws all players on the map with corresponding colors. Doesn't draw players seen by player.
-     * @param g Graphics object gotten as argument in paintComponent method
-     */
-    private void drawPlayers(Graphics g){
-
-        int drawX;
-        int drawY;
-
-        for(Player player : players){
-
-            drawX = (player.getX() - humanPlayer.getX())*scale + ((getWidth()-scale)/2);
-            drawY = (player.getY() - humanPlayer.getY())*scale + ((getHeight()-scale)/2);
-
-            if(!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
-                g.setColor(player.getColor());
-                g.fillRect(drawX, drawY, scale, scale);
-            }
-
-        }
     }
 
     /**
@@ -129,8 +109,8 @@ public class Board extends JPanel {
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
 
-                drawX = (i - humanPlayer.getX())*scale + ((getWidth()-scale)/2);
-                drawY = (j - humanPlayer.getY())*scale + ((getHeight()-scale)/2);
+                drawX = (i - humanPlayer.getX())*scale + ((getWidth()-scale)/2) + (int)((-humanPlayer.getDx()) *scale* (tickCounter/(double)tickReset));
+                drawY = (j - humanPlayer.getY())*scale + ((getHeight()-scale)/2) + (int)((-humanPlayer.getDy()) *scale* (tickCounter/(double)tickReset));
 
                 if(!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
                     g.setColor(Color.white);
@@ -143,13 +123,77 @@ public class Board extends JPanel {
         }
     }
 
+    /**
+     * Draws all players on the map with corresponding colors. Doesn't draw players seen by player.
+     * @param g Graphics object gotten as argument in paintComponent method
+     */
+    private void drawPlayers(Graphics g){
+
+        int drawX;
+        int drawY;
+
+        for(Player player : players){
+
+            drawX = (player.getX() - humanPlayer.getX())*scale + ((getWidth()-scale)/2);
+            drawY = (player.getY() - humanPlayer.getY())*scale + ((getHeight()-scale)/2);
+            if(player != humanPlayer){
+                drawX += (int)((player.getDx() -humanPlayer.getDx()) *scale* (tickCounter/(double)tickReset));
+                drawY += (int)((player.getDy() -humanPlayer.getDy()) *scale* (tickCounter/(double)tickReset));
+            }
+
+            if(!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
+                g.setColor(player.getColor());
+                g.fillRect(drawX, drawY, scale, scale);
+            }
+
+        }
+    }
+
+    /**
+     * Method responsible for main logic of the game
+     */
+    private void tick(){
+
+
+        for (Player player : players) {
+            player.move();
+            try {
+                if (gameArea[player.getX()][player.getY()].getOwner() != player) {
+                    player.checkCollision(gameArea[player.getX()][player.getY()]);
+                    player.setTileContested(gameArea[player.getX()][player.getY()]);
+                } else if ((gameArea[player.getX()][player.getY()].getOwner() == player) && (player.getTilesContested().size() > 0)) {
+                    player.contestToOwned();
+                    fillEnclosure(player);
+                }
+
+            } catch (ArrayIndexOutOfBoundsException e) {
+                //System.out.println(e);
+                player.death();
+            }
+        }
+        if(keyToSend != null){
+            humanPlayer.keyPressed(keyToSend);
+            keyToSend = null;
+        }
+
+
+    }
+
+    /**
+     * Controls tick counter of game which is needed to make game smooth.
+     */
+    private void updateTick(){
+        tickCounter++;
+        tickCounter %= tickReset;
+    }
 
     /**
      * After a player has traveled out to enclose an area the area needs to be filled. This method depends on that the
      * Player.contestedToOwned() method has been called. The method works by doing a depth first search from each tile
      * adjacent to a tile owned by the player sent as parameter. If the DFS algorithm finds a boundary we know it is not
      * enclosed and should not be filled. The boundary is the smallest rectangle surrounding all owned tiles by the
-     * player to minimize cost of method. If the DFS can't find the boundary we know it should be filled.
+     * player to minimize cost of method. If the DFS can't find the boundary or if the one the DFS starts on we know it
+     * should be filled.
      * @param player The player whose enclosure to be filled
      */
     private void fillEnclosure(Player player) {
@@ -183,33 +227,34 @@ public class Board extends JPanel {
 
         // Loop over all tiles to do DFS from
         for(Tile t : toCheck){
-            Stack<Tile> stack = new Stack<>();
-            boolean cont = true;
-            Tile v;
-            visited.clear();
+            if(!inside.contains(t)){
+                Stack<Tile> stack = new Stack<>();
+                boolean cont = true;
+                Tile v;
+                visited.clear();
 
-            // DFS algorithm
-            stack.push(t);
-            while((!stack.empty()) && cont){
-                v = stack.pop();
-                if(!visited.contains(v) && (v.getOwner() != player)){
-                    if(v.getX() < minX || v.getX() > maxX || v.getY() < minY || v.getY() > maxY){
-                        cont = false;
-                    }else{
-                        visited.add(v);
-                        stack.push(gameArea[v.getY()-1][v.getX()]);
-                        stack.push(gameArea[v.getY()+1][v.getX()]);
-                        stack.push(gameArea[v.getY()][v.getX()-1]);
-                        stack.push(gameArea[v.getY()][v.getX()+1]);
+                // DFS algorithm
+                stack.push(t);
+                while((!stack.empty()) && cont){
+                    v = stack.pop();
+                    if(!visited.contains(v) && (v.getOwner() != player)){
+                        if(v.getX() < minX || v.getX() > maxX || v.getY() < minY || v.getY() > maxY){
+                            cont = false;
+                        }else{
+                            visited.add(v);
+                            stack.push(gameArea[v.getY()-1][v.getX()]);
+                            stack.push(gameArea[v.getY()+1][v.getX()]);
+                            stack.push(gameArea[v.getY()][v.getX()-1]);
+                            stack.push(gameArea[v.getY()][v.getX()+1]);
+                        }
                     }
                 }
+                if(cont){ // If DFS don't find boundary
+                    inside.addAll(visited);
+                }else{
+                    outside.addAll(visited);
+                }
             }
-            if(cont){ // If DFS don't find boundary
-                inside.addAll(visited);
-            }else{
-                outside.addAll(visited);
-            }
-
         }
 
         // Set all enclosed tiles to be owned by player
@@ -226,23 +271,11 @@ public class Board extends JPanel {
         // TODO Fix all collision detections
         @Override
         public void run() {
-            for(Player player : players){
-                player.move();
-                try {
-                    if (gameArea[player.getX()][player.getY()].getOwner() != player) {
-                        player.checkCollision(gameArea[player.getX()][player.getY()]);
-                        player.setTileContested(gameArea[player.getX()][player.getY()]);
-                    } else if ((gameArea[player.getX()][player.getY()].getOwner() == player) && (player.getTilesContested().size() > 0)){
-                        player.contestToOwned();
-                        fillEnclosure(player);
-                    }
-
-                } catch (ArrayIndexOutOfBoundsException e){
-                    //System.out.println(e);
-                    player.death();
-                }
-            }
+            updateTick();
             repaint();
+            if(tickCounter == 0){
+                tick();
+            }
         }
     }
 
@@ -250,7 +283,8 @@ public class Board extends JPanel {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            humanPlayer.keyPressed(e);
+            keyToSend = e;
+            //humanPlayer.keyPressed(e);
         }
     }
 }

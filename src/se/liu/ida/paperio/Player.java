@@ -110,4 +110,12 @@ public abstract class Player {
     public void death(){
 
     }
+
+    public int getDx() {
+        return dx;
+    }
+
+    public int getDy() {
+        return dy;
+    }
 }
