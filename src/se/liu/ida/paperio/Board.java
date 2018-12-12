@@ -82,6 +82,9 @@ public class Board extends JPanel {
         Toolkit.getDefaultToolkit().sync();
     }
 
+    // TODO Draw a live scoreboard
+    // TODO Ask for name and print name under player
+    // TODO Make movement smooth (several ticks between getting from one tile to the next)
     /**
      * Main method responsible for drawing everything to the screen
      * @param g Graphics object gotten as argument in paintComponent method
@@ -220,6 +223,7 @@ public class Board extends JPanel {
     private class ScheduleTask extends TimerTask {
 
         // TODO make tick separate method
+        // TODO Fix all collision detections
         @Override
         public void run() {
             for(Player player : players){

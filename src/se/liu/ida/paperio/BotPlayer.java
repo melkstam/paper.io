@@ -9,22 +9,22 @@ public class BotPlayer extends Player{
     public BotPlayer(int height, int width){
         super(height, width);
 
-        if (rand < 0.05) {
+        if (rand < 0.25) {
             dx = 1;
             dy = 0;
-        } else if (rand < 0.1) {
+        } else if (rand < 5) {
             dx = -1;
             dy = 0;
-        } else if (rand < 0.15) {
+        } else if (rand < 0.75) {
             dx = 0;
             dy = 1;
-        } else if (rand < 0.2) {
+        } else {
             dx = 0;
             dy = -1;
         }
     }
 
-
+    // TODO Make smarter bots
     /**
      * Decides where the bot shall move and moves accordingly
      */
@@ -85,19 +85,15 @@ public class BotPlayer extends Player{
         }else if(x == 0 && dx == -1){
             dx = 0;
             dy = 1;
-            //System.out.println("Avoided Out of bounds");
         }else if(x == width -1 &&  dx == 1){
             dx = 0;
             dy = 1;
-            //System.out.println("Avoided Out of bounds");
         }else if(y == 0 && dy == -1){
             dx = 1;
             dy = 0;
-            //System.out.println("Avoided Out of bounds");
         }else if(y == height -1 && dy == 1){
             dx = 1;
             dy = 0;
-            //System.out.println("Avoided Out of bounds");
         }
     }
 }

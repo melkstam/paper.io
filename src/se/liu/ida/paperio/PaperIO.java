@@ -9,6 +9,8 @@ public class PaperIO extends JFrame {
         initUI();
     }
 
+    // TODO Add menu to be able to make selections
+    // TODO Add possibility for local multiplayer (split screen)
     private void initUI(){
         add(new Board());
         setSize(1000, 1000);

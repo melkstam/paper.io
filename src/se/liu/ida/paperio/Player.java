@@ -5,17 +5,18 @@ import java.util.ArrayList;
 
 public abstract class Player {
 
-    protected int x;
-    protected int y;
-    protected int dx;
-    protected int dy;
-    protected Color color;
-    protected ArrayList<Tile> tilesOwned = new ArrayList<>();
-    protected ArrayList<Tile> tilesContested = new ArrayList<>();
-    protected int height;
-    protected int width;
+    int x;
+    int y;
+    int dx;
+    int dy;
+    Color color;
+    ArrayList<Tile> tilesOwned = new ArrayList<>();
+    ArrayList<Tile> tilesContested = new ArrayList<>();
+    int height;
+    int width;
 
-
+    // TODO Make sure players start on a non-occupied spot
+    // TODO Improve color selection
     public Player(int height, int width){
         x = (int)(Math.random() * (width - 2) +1);
         y = (int)(Math.random() * (height - 2) +1);
@@ -101,11 +102,12 @@ public abstract class Player {
 
     public void checkCollision(Tile t){
         if(t.getContestedOwner() != null || t.getContestedOwner() == this){
-            //System.out.println(this + "DIEDED");
+
         }
     }
 
+    // TODO Fix death method
     public void death(){
-        //System.out.println("You diededed");
+
     }
 }
