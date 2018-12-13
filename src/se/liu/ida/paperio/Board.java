@@ -17,17 +17,23 @@ public class Board extends JPanel {
     private List<Player> players = new ArrayList<>();
     private HumanPlayer humanPlayer;
 
-    private final int scale = 25;
+    private final int scale = 15;
     private int tickCounter = 0;
     private final int tickReset = 8;
 
     private final int INITIAL_DELAY = 0;
     private final int PERIOD_INTERVAL = 1000/60;
 
+    boolean splitScreen = true;
+
     private KeyEvent keyToSend;
 
 
-    Board(){
+    private List<Color> colorList = new ArrayList<>(Arrays.asList(Color.magenta, Color.green, Color.red,
+            Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
+            new Color(255,43,119), new Color(100,255,162)));
+
+    public Board(){
         initBoard();
     }
 
@@ -42,22 +48,24 @@ public class Board extends JPanel {
         setFocusable(true);
         addKeyListener(new TAdapter());
 
-
-        players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
+        players.add(new HumanPlayer(gameArea.length, gameArea[0].length, new Color((int)(Math.random() * 0x1000000))));
         humanPlayer = (HumanPlayer)players.get(0);
-        for(int i = 0; i < 0; i++){
-            players.add(new BotPlayer(gameArea.length, gameArea[0].length));
+        for(int i = 0; i < 1; i++){
+            if(i > 9){
+                players.add(new BotPlayer(gameArea.length,gameArea[0].length,
+                        new Color((int)(Math.random() * 0x1000000))));
+            }else {
+                players.add(new BotPlayer(gameArea.length, gameArea[0].length, colorList.get(i)));
+            }
         }
         for(Player player : players){
             startingArea(player);
         }
 
-
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
-
 
 
     /**
@@ -87,6 +95,7 @@ public class Board extends JPanel {
 
     // TODO Draw a live scoreboard
     // TODO Ask for name and print name under player
+    // TODO Only interpolate drawPlayers and not gameArea (Optimize)
     /**
      * Main method responsible for drawing everything to the screen
      * @param g Graphics object gotten as argument in paintComponent method
@@ -101,23 +110,52 @@ public class Board extends JPanel {
      * player.
      * @param g Graphics object gotten as argument in paintComponent method
      */
-    private void drawGameArea(Graphics g){
+    private void drawGameArea(Graphics g) {
 
         int drawX;
         int drawY;
+        int drawXSplit;
+        int drawYSplit;
+        if (!splitScreen){
+            for (int i = 0; i < gameArea.length; i++) {
+                for (int j = 0; j < gameArea[i].length; j++) {
+                    drawX = (i - humanPlayer.getX()) * scale + ((getWidth() - scale) / 2) + (int) ((-humanPlayer.getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawY = (j - humanPlayer.getY()) * scale + ((getHeight() - scale) / 2) + (int) ((-humanPlayer.getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
 
-        for(int i = 0; i < gameArea.length; i++){
-            for(int j = 0; j < gameArea[i].length; j++){
+                    if (!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
+                        g.setColor(Color.white);
+                        g.fillRect(drawX, drawY, scale, scale);
 
-                drawX = (i - humanPlayer.getX())*scale + ((getWidth()-scale)/2) + (int)((-humanPlayer.getDx()) *scale* ((tickCounter+1)/(double)tickReset));
-                drawY = (j - humanPlayer.getY())*scale + ((getHeight()-scale)/2) + (int)((-humanPlayer.getDy()) *scale* ((tickCounter+1)/(double)tickReset));
+                        g.setColor(gameArea[i][j].getColor());
+                        g.fillRect(drawX, drawY, scale, scale);
+                    }
+                }
+            }
+        }else {
+            for (int i = 0; i < gameArea.length; i++) {
+                for (int j = 0; j < gameArea[i].length; j++) {
+                    drawX = (i - humanPlayer.getX()) * scale + ((getWidth() - scale) / 4) + (int) ((-humanPlayer.getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawY = (j - humanPlayer.getY()) * scale + ((getHeight() - scale) / 2) + (int) ((-humanPlayer.getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
 
-                if(!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
-                    g.setColor(Color.white);
-                    g.fillRect(drawX, drawY, scale, scale);
+                    if (!(drawX + scale < 0 || drawX > (getWidth() / 2) || drawY + scale < 0 || drawY > getHeight())) {
+                        g.setColor(Color.white);
+                        g.fillRect(drawX, drawY, scale, scale);
 
-                    g.setColor(gameArea[i][j].getColor());
-                    g.fillRect(drawX, drawY, scale, scale);
+                        g.setColor(gameArea[i][j].getColor());
+                        g.fillRect(drawX, drawY, scale, scale);
+                    }
+
+
+                    drawXSplit = (i - players.get(0).getX()) * scale + ((getWidth() - scale) / 4) + (getWidth() / 2) + (int) ((-players.get(0).getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawYSplit = (j - players.get(0).getY()) * scale + ((getHeight() - scale) / 2) + (int) ((-players.get(0).getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
+
+                    if (!(drawXSplit + scale < 0 || drawXSplit > (getWidth() / 2) || drawYSplit + scale < 0 || drawYSplit > getHeight())) {
+                        g.setColor(Color.white);
+                        g.fillRect(drawXSplit, drawYSplit, scale, scale);
+
+                        g.setColor(gameArea[i][j].getColor());
+                        g.fillRect(drawXSplit, drawYSplit, scale, scale);
+                    }
                 }
             }
         }
@@ -127,25 +165,41 @@ public class Board extends JPanel {
      * Draws all players on the map with corresponding colors. Doesn't draw players seen by player.
      * @param g Graphics object gotten as argument in paintComponent method
      */
-    private void drawPlayers(Graphics g){
+    private void drawPlayers(Graphics g) {
 
         int drawX;
         int drawY;
 
-        for(Player player : players){
+        int drawXSplit;
+        int drawYSplit;
 
-            drawX = (player.getX() - humanPlayer.getX())*scale + ((getWidth()-scale)/2);
-            drawY = (player.getY() - humanPlayer.getY())*scale + ((getHeight()-scale)/2);
-            if(player != humanPlayer){
-                drawX += (int)((player.getDx() -humanPlayer.getDx()) *scale* ((tickCounter+1)/(double)tickReset));
-                drawY += (int)((player.getDy() -humanPlayer.getDy()) *scale* ((tickCounter+1)/(double)tickReset));
+        for (Player player : players) {
+            if(!splitScreen) {
+                drawX = (player.getX() - humanPlayer.getX()) * scale + ((getWidth() - scale) / 2);
+                drawY = (player.getY() - humanPlayer.getY()) * scale + ((getHeight() - scale) / 2);
+                if (player != humanPlayer) {
+                    drawX += (int) ((player.getDx() - humanPlayer.getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawY += (int) ((player.getDy() - humanPlayer.getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
+                }
+
+                if (!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
+                    g.setColor(player.getColor());
+                    g.fillRect(drawX, drawY, scale, scale);
+                }
+
+            }else {
+                drawX = (player.getX() - humanPlayer.getX()) * scale + ((getWidth() - scale) / 4);
+                drawY = (player.getY() - humanPlayer.getY()) * scale + ((getHeight() - scale) / 2);
+                if (player != humanPlayer) {
+                    drawX += (int) ((player.getDx() - humanPlayer.getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawY += (int) ((player.getDy() - humanPlayer.getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
+                }
+
+                if (!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
+                    g.setColor(player.getColor());
+                    g.fillRect(drawX, drawY, scale, scale);
+                }
             }
-
-            if(!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
-                g.setColor(player.getColor());
-                g.fillRect(drawX, drawY, scale, scale);
-            }
-
         }
     }
 
@@ -153,8 +207,6 @@ public class Board extends JPanel {
      * Method responsible for main logic of the game
      */
     private void tick(){
-
-
         for (Player player : players) {
             player.move();
             try {
@@ -165,18 +217,14 @@ public class Board extends JPanel {
                     player.contestToOwned();
                     fillEnclosure(player);
                 }
-
             } catch (ArrayIndexOutOfBoundsException e) {
                 //System.out.println(e);
-                player.death();
             }
         }
         if(keyToSend != null){
             humanPlayer.keyPressed(keyToSend);
             keyToSend = null;
         }
-
-
     }
 
     /**
@@ -208,7 +256,6 @@ public class Board extends JPanel {
             if(t.getY() > maxY) maxY = t.getY();
             if(t.getY() < minY) minY = t.getY();
         }
-
 
         // Necessary collections for DFS to work
         ArrayList<Tile> outside = new ArrayList<>();
@@ -270,7 +317,6 @@ public class Board extends JPanel {
         for(Tile t : inside){
             player.setTileOwned(t);
         }
-
     }
 
 

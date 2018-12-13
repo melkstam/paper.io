@@ -1,9 +1,10 @@
 package se.liu.ida.paperio;
+import java.awt.Color;
 
 class BotPlayer extends Player{
 
-    BotPlayer(int height, int width){
-        super(height, width);
+    BotPlayer(int height, int width, Color color){
+        super(height, width, color);
 
         double rand = Math.random();
         if (rand < 0.25) {
@@ -46,7 +47,6 @@ class BotPlayer extends Player{
         avoidOutOfBounds();
 
     }
-
     private void avoidOutOfBounds(){
         if(x == 0 && y == height - 1){
             if(dx == -1){
@@ -94,4 +94,5 @@ class BotPlayer extends Player{
             dy = 0;
         }
     }
+
 }

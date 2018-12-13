@@ -1,12 +1,12 @@
 package se.liu.ida.paperio;
 
 import java.awt.event.KeyEvent;
-
+import java.awt.Color;
 public class HumanPlayer extends Player {
 
 
-    HumanPlayer(int height, int width){
-        super(height, width);
+    HumanPlayer(int height, int width, Color color){
+        super(height, width, color);
     }
 
 
@@ -20,7 +20,6 @@ public class HumanPlayer extends Player {
     }
 
 
-    // TODO Fix so Player only can change directions once per tick
     /**
      * Handles player movement controls
      * @param e Key that is being pressed

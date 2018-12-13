@@ -16,15 +16,13 @@ abstract class Player {
     int width;
 
     // TODO Make sure players start on a non-occupied spot
-    // TODO Improve color selection
-    Player(int height, int width){
+    Player(int height, int width, Color color){
         x = (int)(Math.random() * (width - 2) +1);
         y = (int)(Math.random() * (height - 2) +1);
-        color = new Color((int)(Math.random() * 0x1000000));
+        this.color = color;
         this.height = height;
         this.width = width;
     }
-
 
     /**
      * The x position in the tile system
@@ -104,11 +102,6 @@ abstract class Player {
         if(t.getContestedOwner() != null || t.getContestedOwner() == this){
 
         }
-    }
-
-    // TODO Fix death method
-    void death(){
-
     }
 
     int getDx() {
