@@ -2,7 +2,6 @@ package se.liu.ida.paperio;
 
 import javax.swing.JPanel;
 import java.awt.event.*;
-import java.sql.SQLOutput;
 import java.util.*;
 
 import java.awt.Graphics;
@@ -14,24 +13,25 @@ public class Board extends JPanel {
 
     // TODO Fix scope of variables (private, public etc)
 
-    Tile[][] gameArea = new Tile[100][100];
-    List<Player> players = new ArrayList<>();
-    HumanPlayer humanPlayer;
+    private Tile[][] gameArea = new Tile[100][100];
+    private List<Player> players = new ArrayList<>();
+    private HumanPlayer humanPlayer;
+
     private final int scale = 25;
     private int tickCounter = 0;
-    private final int tickReset = 10;
+    private final int tickReset = 8;
 
-    private Timer timer;
     private final int INITIAL_DELAY = 0;
     private final int PERIOD_INTERVAL = 1000/60;
+
     private KeyEvent keyToSend;
 
 
-    public Board(){
+    Board(){
         initBoard();
     }
 
-    public void initBoard(){
+    private void initBoard(){
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
                 gameArea[i][j] = new Tile(j,i);
@@ -45,7 +45,7 @@ public class Board extends JPanel {
 
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length));
         humanPlayer = (HumanPlayer)players.get(0);
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 0; i++){
             players.add(new BotPlayer(gameArea.length, gameArea[0].length));
         }
         for(Player player : players){
@@ -53,7 +53,7 @@ public class Board extends JPanel {
         }
 
 
-        timer = new Timer();
+        Timer timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
@@ -64,7 +64,7 @@ public class Board extends JPanel {
      * Marks all tiles in the starting area of a player to owned by player.
      * @param player Player
      */
-    public void startingArea(Player player){
+    private void startingArea(Player player){
         int x = player.getX();
         int y = player.getY();
         for(int i = x-1; i <= x+1; i++){
@@ -91,7 +91,7 @@ public class Board extends JPanel {
      * Main method responsible for drawing everything to the screen
      * @param g Graphics object gotten as argument in paintComponent method
      */
-    public void draw(Graphics g){
+    private void draw(Graphics g){
         drawGameArea(g);
         drawPlayers(g);
     }
@@ -215,6 +215,7 @@ public class Board extends JPanel {
         ArrayList<Tile> inside  = new ArrayList<>();
         ArrayList<Tile> visited = new ArrayList<>();
         HashSet<Tile> toCheck = new HashSet<>();
+
 
         // Add all adjacent tiles
         int y;

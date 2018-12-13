@@ -1,14 +1,11 @@
 package se.liu.ida.paperio;
 
-import java.awt.*;
-import java.util.ArrayList;
+class BotPlayer extends Player{
 
-public class BotPlayer extends Player{
-
-    private double rand = Math.random();
-    public BotPlayer(int height, int width){
+    BotPlayer(int height, int width){
         super(height, width);
 
+        double rand = Math.random();
         if (rand < 0.25) {
             dx = 1;
             dy = 0;
@@ -50,7 +47,7 @@ public class BotPlayer extends Player{
 
     }
 
-    public void avoidOutOfBounds(){
+    private void avoidOutOfBounds(){
         if(x == 0 && y == height - 1){
             if(dx == -1){
                 dx = 0;

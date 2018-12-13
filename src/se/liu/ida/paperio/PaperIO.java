@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 
 public class PaperIO extends JFrame {
 
-    public PaperIO(){
+    private PaperIO(){
         initUI();
     }
 

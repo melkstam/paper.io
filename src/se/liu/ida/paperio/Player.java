@@ -3,21 +3,21 @@ package se.liu.ida.paperio;
 import java.awt.Color;
 import java.util.ArrayList;
 
-public abstract class Player {
+abstract class Player {
 
     int x;
     int y;
     int dx;
     int dy;
-    Color color;
-    ArrayList<Tile> tilesOwned = new ArrayList<>();
-    ArrayList<Tile> tilesContested = new ArrayList<>();
+    private Color color;
+    private ArrayList<Tile> tilesOwned = new ArrayList<>();
+    private ArrayList<Tile> tilesContested = new ArrayList<>();
     int height;
     int width;
 
     // TODO Make sure players start on a non-occupied spot
     // TODO Improve color selection
-    public Player(int height, int width){
+    Player(int height, int width){
         x = (int)(Math.random() * (width - 2) +1);
         y = (int)(Math.random() * (height - 2) +1);
         color = new Color((int)(Math.random() * 0x1000000));
@@ -30,7 +30,7 @@ public abstract class Player {
      * The x position in the tile system
      * @return      x position in the tile system
      */
-    public int getX(){
+    int getX(){
         return x;
     }
 
@@ -38,14 +38,14 @@ public abstract class Player {
      * The y position in the tile system
      * @return      y position in the tile system
      */
-    public int getY(){
+    int getY(){
         return y;
     }
 
     /**
      * @return color of the player
      */
-    public Color getColor(){
+    Color getColor(){
         return color;
     }
 
@@ -53,14 +53,14 @@ public abstract class Player {
     /**
      * Abstract method to move the player
      */
-    public abstract void move();
+    abstract void move();
 
 
     /**
      * Add tile to players list of owned tiles
      * @param t Tile to be added to players owned list
      */
-    public void setTileOwned(Tile t){
+    void setTileOwned(Tile t){
         tilesOwned.add(t);
         t.setOwner(this);
     }
@@ -69,7 +69,7 @@ public abstract class Player {
      * Get tiles owned by player
      * @return Tiles owned by player
      */
-    public ArrayList<Tile> getTilesOwned(){
+    ArrayList<Tile> getTilesOwned(){
         return tilesOwned;
     }
 
@@ -77,7 +77,7 @@ public abstract class Player {
      * Add tile to players list of contested tiles
      * @param t Tile to be added to players contested list
      */
-    public void setTileContested(Tile t){
+    void setTileContested(Tile t){
         tilesContested.add(t);
         t.setContestedOwner(this);
     }
@@ -86,36 +86,36 @@ public abstract class Player {
      * Get tiles contested by player
      * @return Tiles contested by player
      */
-    public ArrayList<Tile> getTilesContested(){
+    ArrayList<Tile> getTilesContested(){
         return tilesContested;
     }
 
     /**
      * Sets contested tiles to owned by player
      */
-    public void contestToOwned(){
+    void contestToOwned(){
         for (Tile t : tilesContested) {
             setTileOwned(t);
         }
         tilesContested.clear();
     }
 
-    public void checkCollision(Tile t){
+    void checkCollision(Tile t){
         if(t.getContestedOwner() != null || t.getContestedOwner() == this){
 
         }
     }
 
     // TODO Fix death method
-    public void death(){
+    void death(){
 
     }
 
-    public int getDx() {
+    int getDx() {
         return dx;
     }
 
-    public int getDy() {
+    int getDy() {
         return dy;
     }
 }

@@ -1,13 +1,11 @@
 package se.liu.ida.paperio;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 
 public class HumanPlayer extends Player {
 
 
-    public HumanPlayer(int height, int width){
+    HumanPlayer(int height, int width){
         super(height, width);
     }
 
@@ -27,7 +25,7 @@ public class HumanPlayer extends Player {
      * Handles player movement controls
      * @param e Key that is being pressed
      */
-    public void keyPressed(KeyEvent e) {
+    void keyPressed(KeyEvent e) {
 
         int key = e.getKeyCode();
 
