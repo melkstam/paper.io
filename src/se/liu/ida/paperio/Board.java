@@ -109,8 +109,8 @@ public class Board extends JPanel {
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
 
-                drawX = (i - humanPlayer.getX())*scale + ((getWidth()-scale)/2) + (int)((-humanPlayer.getDx()) *scale* (tickCounter/(double)tickReset));
-                drawY = (j - humanPlayer.getY())*scale + ((getHeight()-scale)/2) + (int)((-humanPlayer.getDy()) *scale* (tickCounter/(double)tickReset));
+                drawX = (i - humanPlayer.getX())*scale + ((getWidth()-scale)/2) + (int)((-humanPlayer.getDx()) *scale* ((tickCounter+1)/(double)tickReset));
+                drawY = (j - humanPlayer.getY())*scale + ((getHeight()-scale)/2) + (int)((-humanPlayer.getDy()) *scale* ((tickCounter+1)/(double)tickReset));
 
                 if(!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
                     g.setColor(Color.white);
@@ -137,8 +137,8 @@ public class Board extends JPanel {
             drawX = (player.getX() - humanPlayer.getX())*scale + ((getWidth()-scale)/2);
             drawY = (player.getY() - humanPlayer.getY())*scale + ((getHeight()-scale)/2);
             if(player != humanPlayer){
-                drawX += (int)((player.getDx() -humanPlayer.getDx()) *scale* (tickCounter/(double)tickReset));
-                drawY += (int)((player.getDy() -humanPlayer.getDy()) *scale* (tickCounter/(double)tickReset));
+                drawX += (int)((player.getDx() -humanPlayer.getDx()) *scale* ((tickCounter+1)/(double)tickReset));
+                drawY += (int)((player.getDy() -humanPlayer.getDy()) *scale* ((tickCounter+1)/(double)tickReset));
             }
 
             if(!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
@@ -217,11 +217,15 @@ public class Board extends JPanel {
         HashSet<Tile> toCheck = new HashSet<>();
 
         // Add all adjacent tiles
+        int y;
+        int x;
         for(Tile t : player.getTilesOwned()){
-            toCheck.add(gameArea[t.getY()-1][t.getX()]);
-            toCheck.add(gameArea[t.getY()+1][t.getX()]);
-            toCheck.add(gameArea[t.getY()][t.getX()-1]);
-            toCheck.add(gameArea[t.getY()][t.getX()+1]);
+            y = t.getY();
+            x = t.getX();
+            if(y -1 >= 0) toCheck.add(gameArea[y-1][x]);
+            if(y + 1 < gameArea.length) toCheck.add(gameArea[y+1][x]);
+            if(x - 1 >= 0) toCheck.add(gameArea[y][x-1]);
+            if(x + 1 < gameArea[y].length) toCheck.add(gameArea[y][x+1]);
         }
 
 
@@ -238,14 +242,18 @@ public class Board extends JPanel {
                 while((!stack.empty()) && cont){
                     v = stack.pop();
                     if(!visited.contains(v) && (v.getOwner() != player)){
-                        if(v.getX() < minX || v.getX() > maxX || v.getY() < minY || v.getY() > maxY){
+                        y = v.getY();
+                        x = v.getX();
+                        if(outside.contains(v) //If already declared as outside
+                        || x < minX || x > maxX || y < minY || y > maxY //If outside of boundary
+                        || x == gameArea[0].length -1 || x == 0 || y == 0 || y == gameArea.length -1){ // If it is a edge tile
                             cont = false;
                         }else{
                             visited.add(v);
-                            stack.push(gameArea[v.getY()-1][v.getX()]);
-                            stack.push(gameArea[v.getY()+1][v.getX()]);
-                            stack.push(gameArea[v.getY()][v.getX()-1]);
-                            stack.push(gameArea[v.getY()][v.getX()+1]);
+                            if(y -1 >= 0) stack.push(gameArea[y-1][x]);
+                            if(y + 1 < gameArea.length) stack.push(gameArea[y+1][x]);
+                            if(x - 1 >= 0) stack.push(gameArea[y][x-1]);
+                            if(x + 1 < gameArea[y].length) stack.push(gameArea[y][x+1]);
                         }
                     }
                 }
@@ -272,10 +280,10 @@ public class Board extends JPanel {
         @Override
         public void run() {
             updateTick();
-            repaint();
             if(tickCounter == 0){
                 tick();
             }
+            repaint();
         }
     }
 

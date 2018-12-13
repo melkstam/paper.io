@@ -32,7 +32,6 @@ public class BotPlayer extends Player{
     public void move() {
         x += dx;
         y += dy;
-
         double rand = Math.random();
         if (rand < 0.05 && dx != -1) {
             dx = 1;
@@ -48,7 +47,9 @@ public class BotPlayer extends Player{
             dy = -1;
         }
         avoidOutOfBounds();
+
     }
+
     public void avoidOutOfBounds(){
         if(x == 0 && y == height - 1){
             if(dx == -1){
