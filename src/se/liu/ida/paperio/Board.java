@@ -146,10 +146,10 @@ public class Board extends JPanel {
                     }
 
 
-                    drawXSplit = (i - players.get(0).getX()) * scale + ((getWidth() - scale) / 4) + (getWidth() / 2) + (int) ((-players.get(0).getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
-                    drawYSplit = (j - players.get(0).getY()) * scale + ((getHeight() - scale) / 2) + (int) ((-players.get(0).getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawXSplit = (i - players.get(1).getX()) * scale + ((getWidth() - scale) / 4) + (getWidth() / 2) + (int) ((-players.get(1).getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawYSplit = (j - players.get(1).getY()) * scale + ((getHeight() - scale) / 2) + (int) ((-players.get(1).getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
 
-                    if (!(drawXSplit + scale < 0 || drawXSplit > (getWidth() / 2) || drawYSplit + scale < 0 || drawYSplit > getHeight())) {
+                    if (!(drawXSplit + scale < 0 || drawXSplit > (getWidth()) || drawYSplit + scale < 0 || drawYSplit > getHeight())) {
                         g.setColor(Color.white);
                         g.fillRect(drawXSplit, drawYSplit, scale, scale);
 
@@ -198,6 +198,18 @@ public class Board extends JPanel {
                 if (!(drawX + scale < 0 || drawX > getWidth() || drawY + scale < 0 || drawY > getHeight())) {
                     g.setColor(player.getColor());
                     g.fillRect(drawX, drawY, scale, scale);
+                }
+
+                drawXSplit = (player.getX() - players.get(1).getX()) * scale + (((getWidth() - scale) / 4) + getWidth() / 2);
+                drawYSplit = (player.getY() - players.get(1).getY()) * scale + ((getHeight() - scale) / 2);
+                if (player != humanPlayer) {
+                    drawXSplit += (int) ((player.getDx() - players.get(1).getDx()) * scale * ((tickCounter + 1) / (double) tickReset));
+                    drawYSplit += (int) ((player.getDy() - players.get(1).getDy()) * scale * ((tickCounter + 1) / (double) tickReset));
+                }
+
+                if (!(drawXSplit + scale < 0 || drawXSplit > getWidth() || drawYSplit + scale < 0 || drawYSplit > getHeight())) {
+                    g.setColor(player.getColor());
+                    g.fillRect(drawXSplit, drawYSplit, scale, scale);
                 }
             }
         }
