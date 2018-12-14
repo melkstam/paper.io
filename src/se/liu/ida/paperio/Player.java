@@ -99,8 +99,8 @@ abstract class Player {
     }
 
     void checkCollision(Tile t){
-        if(t.getContestedOwner() != null || t.getContestedOwner() == this){
-
+        if(t.getContestedOwner() != null) {
+            System.out.println("Trail collision detected");
         }
     }
 
