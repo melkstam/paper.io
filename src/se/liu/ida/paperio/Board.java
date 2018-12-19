@@ -1,12 +1,13 @@
 package se.liu.ida.paperio;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
 
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.Color;
+import java.util.Timer;
 
 // TODO Comment code
 public class Board extends JPanel {
@@ -16,30 +17,35 @@ public class Board extends JPanel {
     private Tile[][] gameArea = new Tile[100][100];
     private List<Player> players = new ArrayList<>();
     private HumanPlayer humanPlayer;
-    private HashMap<Player, int[]> playerPositions = new HashMap<Player, int[]>();
+    private HashMap<Player, int[]> playerPositions = new HashMap<>();
 
 
-    private final int scale = 10;
+    private final int scale = 20;
     private int tickCounter = 0;
     private final int tickReset = 8;
 
     private final int INITIAL_DELAY = 0;
     private final int PERIOD_INTERVAL = 1000/60;
 
-    boolean splitScreen = true;
+    private boolean splitScreen = false;
 
-    private KeyEvent keyToSend;
+    private boolean paused = true;
 
+    private int keyToSend;
+    private ActionListener actionListener;
 
     private List<Color> colorList = new ArrayList<>(Arrays.asList(Color.magenta, Color.green, Color.red,
             Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
             new Color(255,43,119), new Color(100,255,162)));
 
-    public Board(){
+    public Board(ActionListener actionListener){
+        this.actionListener = actionListener;
         initBoard();
     }
 
     private void initBoard(){
+        specifyKeyActions();
+
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
                 gameArea[i][j] = new Tile(j,i);
@@ -47,12 +53,10 @@ public class Board extends JPanel {
         }
 
         setBackground(Color.BLACK);
-        setFocusable(true);
-        addKeyListener(new TAdapter());
 
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length, new Color((int)(Math.random() * 0x1000000))));
         humanPlayer = (HumanPlayer)players.get(0);
-        for(int i = 0; i < 1; i++){
+        for(int i = 0; i < 10; i++){
             if(i > 9){
                 players.add(new BotPlayer(gameArea.length,gameArea[0].length,
                         new Color((int)(Math.random() * 0x1000000))));
@@ -69,6 +73,46 @@ public class Board extends JPanel {
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
 
+    /**
+     * Specifies necessary key bindings and key actions for game to work.
+     */
+    private void specifyKeyActions(){
+        InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = getActionMap();
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "moveUP");
+        am.put("moveUP", new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                keyToSend = KeyEvent.VK_UP;
+            }
+        });
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "moveDOWN");
+        am.put("moveDOWN", new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                keyToSend = KeyEvent.VK_DOWN;
+            }
+        });
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "moveLEFT");
+        am.put("moveLEFT", new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                keyToSend = KeyEvent.VK_LEFT;
+            }
+        });
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "moveRIGHT");
+        am.put("moveRIGHT", new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                keyToSend = KeyEvent.VK_RIGHT;
+            }
+        });
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "pause");
+        am.put("pause", new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                ActionEvent action = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "pause");
+                actionListener.actionPerformed(action);
+            }
+        });
+    }
 
     /**
      * Marks all tiles in the starting area of a player to owned by player.
@@ -262,9 +306,9 @@ public class Board extends JPanel {
             }
         }
 
-        if(keyToSend != null){
+        if(keyToSend != 0){
             humanPlayer.keyPressed(keyToSend);
-            keyToSend = null;
+            keyToSend = 0;
         }
     }
 
@@ -360,6 +404,10 @@ public class Board extends JPanel {
         }
     }
 
+    public void setPaused(Boolean b){
+        paused = b;
+    }
+
 
     private class ScheduleTask extends TimerTask {
 
@@ -367,20 +415,14 @@ public class Board extends JPanel {
         // TODO Fix player collision detections
         @Override
         public void run() {
-            updateTick();
-            if(tickCounter == 0){
-                tick();
+            if(!paused) {
+                updateTick();
+                if (tickCounter == 0) {
+                    tick();
+                }
+                repaint();
             }
-            repaint();
         }
     }
 
-    private class TAdapter extends KeyAdapter {
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            keyToSend = e;
-            //humanPlayer.keyPressed(e);
-        }
-    }
 }

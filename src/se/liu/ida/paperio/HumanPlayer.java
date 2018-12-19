@@ -22,11 +22,9 @@ public class HumanPlayer extends Player {
 
     /**
      * Handles player movement controls
-     * @param e Key that is being pressed
+     * @param key Key that is being pressed
      */
-    void keyPressed(KeyEvent e) {
-
-        int key = e.getKeyCode();
+    void keyPressed(int key) {
 
         if (key == KeyEvent.VK_LEFT && dx != 1) {
             dx = -1;
