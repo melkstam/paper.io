@@ -19,7 +19,6 @@ public class Board extends JPanel {
     private HumanPlayer humanPlayer;
     private HashMap<Player, int[]> playerPositions = new HashMap<>();
 
-
     private final int scale = 20;
     private int tickCounter = 0;
     private final int tickReset = 8;
@@ -28,8 +27,10 @@ public class Board extends JPanel {
     private final int PERIOD_INTERVAL = 1000/60;
 
     private boolean splitScreen = false;
-
     private boolean paused = true;
+
+    private String p1name;
+    private String p2name;
 
     private int keyToSend;
     private ActionListener actionListener;
@@ -38,8 +39,16 @@ public class Board extends JPanel {
             Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
             new Color(255,43,119), new Color(100,255,162)));
 
-    public Board(ActionListener actionListener){
+    public Board(ActionListener actionListener, String p1name){
         this.actionListener = actionListener;
+        this.p1name = p1name;
+        initBoard();
+    }
+
+    public Board(ActionListener actionListener, String p1name, String p2name) {
+        this.actionListener = actionListener;
+        this.p1name = p1name;
+        this.p2name = p2name;
         initBoard();
     }
 
@@ -140,7 +149,7 @@ public class Board extends JPanel {
     }
 
     // TODO Draw a live scoreboard
-    // TODO Ask for name and print name under player
+    // TODO Print name under player
     // TODO Only interpolate drawPlayers and not gameArea (Optimize)
     // TODO Fix right side splitscreen rendering 1/4 of left side
     // TODO Fix right side splitscreen jagged/interpolated(?) movement

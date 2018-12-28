@@ -1,5 +1,6 @@
 package se.liu.ida.paperio;
 
+// TODO Cleanup imports
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -17,7 +18,6 @@ public class PaperIO extends JFrame implements ActionListener{
         initUI();
     }
 
-    // TODO Add menu to be able to make selections
     // TODO Add possibility for local multiplayer (split screen)
     private void initUI(){
 
@@ -28,11 +28,11 @@ public class PaperIO extends JFrame implements ActionListener{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        board = new Board(this);
+        //board = new Board(this);
         menu = new Menu(this);
         cards = new JPanel(new CardLayout());
         cards.add(menu, "menu");
-        cards.add(board, "board");
+
         add(cards);
     }
 
@@ -54,7 +54,13 @@ public class PaperIO extends JFrame implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand().equals("Play")){
+        if(e.getActionCommand().equals("Play Singleplayer")) {
+            board = new Board(this, menu.getP1Name());
+            cards.add(board, "board");
+            setState(STATE.GAME);
+        }else if(e.getActionCommand().equals("Play Multiplayer")){
+            board = new Board(this, menu.getP1Name(), menu.getP2Name());
+            cards.add(board, "board");
             setState(STATE.GAME);
         }else if(e.getActionCommand().equals("pause")){
             setState(STATE.MENU);
@@ -65,8 +71,7 @@ public class PaperIO extends JFrame implements ActionListener{
         System.setProperty("sun.java2d.opengl", "True");
 
         EventQueue.invokeLater(() -> {
-            PaperIO ex = new PaperIO();
-            ex.setVisible(true);
+            new PaperIO();
         });
     }
 
