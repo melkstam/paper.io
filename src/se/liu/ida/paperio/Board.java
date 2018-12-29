@@ -1,20 +1,22 @@
 package se.liu.ida.paperio;
 
 import javax.swing.*;
-import java.awt.event.*;
-import java.util.*;
-
-import java.awt.Graphics;
-import java.awt.Toolkit;
-import java.awt.Color;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.Timer;
+import java.util.*;
 
 // TODO Comment code
 public class Board extends JPanel {
 
     // TODO Fix scope of variables (private, public etc)
 
-    private Tile[][] gameArea = new Tile[100][100];
+    private int areaHeight = 100;
+    private int areaWidth = 100;
+    private Tile[][] gameArea = new Tile[areaHeight][areaWidth];
     private List<Player> players = new ArrayList<>();
     private HumanPlayer humanPlayer;
     private HashMap<Player, int[]> playerPositions = new HashMap<>();
@@ -63,7 +65,7 @@ public class Board extends JPanel {
 
         setBackground(Color.BLACK);
 
-        players.add(new HumanPlayer(gameArea.length, gameArea[0].length, new Color((int)(Math.random() * 0x1000000))));
+        players.add(new HumanPlayer(gameArea.length, gameArea[0].length, new Color((int)(Math.random() * 0x1000000)), p1name));
         humanPlayer = (HumanPlayer)players.get(0);
         for(int i = 0; i < 10; i++){
             if(i > 9){
@@ -148,24 +150,24 @@ public class Board extends JPanel {
         Toolkit.getDefaultToolkit().sync();
     }
 
-    // TODO Draw a live scoreboard
     // TODO Print name under player
     // TODO Only interpolate drawPlayers and not gameArea (Optimize)
     // TODO Fix right side splitscreen rendering 1/4 of left side
     // TODO Fix right side splitscreen jagged/interpolated(?) movement
     /**
      * Main method responsible for drawing everything to the screen
-     * @param g Graphics object gotten as argument in paintComponent method
+     * @param g Graphics object recieved as argument in paintComponent method
      */
     private void draw(Graphics g){
         drawGameArea(g);
         drawPlayers(g);
+        drawScoreboard(g);
     }
 
     /**
      * Draws all tiles on the map with colors corresponding to owner and contested owner. Doesn't draw tiles not seen by
      * player.
-     * @param g Graphics object gotten as argument in paintComponent method
+     * @param g Graphics object recieved as argument in paintComponent method
      */
     private void drawGameArea(Graphics g) {
 
@@ -229,7 +231,7 @@ public class Board extends JPanel {
 
     /**
      * Draws all players on the map with corresponding colors. Doesn't draw players not seen by player.
-     * @param g Graphics object gotten as argument in paintComponent method
+     * @param g Graphics object recieved as argument in paintComponent method
      */
     private void drawPlayers(Graphics g) {
 
@@ -286,8 +288,47 @@ public class Board extends JPanel {
                     g.fillRect(drawXSplit, drawYSplit, scale, scale);
                 }
             }
+
+
+
         }
     }
+
+    /**
+     * Draws the live scoreboard up in the rightmost corner
+     * @param g Graphics object recieved as argument in paintComponent method
+     */
+    private void drawScoreboard(Graphics g) {
+        g.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        FontMetrics fontMetrics = g.getFontMetrics();
+        int fontHeight = fontMetrics.getHeight();
+        int barWidth;
+        int barHeight = fontHeight + 4;
+
+        Player player;
+        String string;
+        Color color;
+
+        double highestPercentOwned = players.get(0).getPercentOwned();
+        Collections.sort(players);
+        for(int i = 0; i < Integer.min(5, players.size()); i++){
+            player = players.get(i);
+            string = String.format("%.2f%% - " + player.getName(), player.getPercentOwned());
+            color = player.getColor();
+
+            barWidth = (int)((player.getPercentOwned() / highestPercentOwned)*(getWidth()/4));
+            g.setColor(player.getColor());
+            g.fillRect(getWidth() - barWidth,  barHeight*i, barWidth,barHeight);
+            // If color is perceived as dark set the font color to white, else black
+            if(0.299*color.getRed() + 0.587*color.getGreen() + 0.114*color.getBlue() < 127){
+                g.setColor(Color.WHITE);
+            }else{
+                g.setColor(Color.BLACK);
+            }
+            g.drawString(string, 2+getWidth() -  barWidth,  barHeight*i + fontHeight);
+        }
+    }
+
 
     /**
      * Method responsible for main logic of the game
@@ -413,6 +454,10 @@ public class Board extends JPanel {
         }
     }
 
+    /**
+     * Set board to paused mode, meaning logic and graphics are not updated
+     * @param b True if game should be paused, false otherwise
+     */
     public void setPaused(Boolean b){
         paused = b;
     }

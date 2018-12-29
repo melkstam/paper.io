@@ -1,9 +1,9 @@
 package se.liu.ida.paperio;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 
-abstract class Player {
+abstract class Player implements Comparable<Player> {
 
     int x;
     int y;
@@ -14,6 +14,7 @@ abstract class Player {
     private ArrayList<Tile> tilesContested = new ArrayList<>();
     int height;
     int width;
+    String name;
 
     // TODO Make sure players start on a non-occupied spot
     Player(int height, int width, Color color){
@@ -63,12 +64,20 @@ abstract class Player {
         t.setOwner(this);
     }
 
+    void removeTileOwned(Tile t){
+        tilesOwned.remove(t);
+    }
+
     /**
      * Get tiles owned by player
      * @return Tiles owned by player
      */
     ArrayList<Tile> getTilesOwned(){
         return tilesOwned;
+    }
+
+    double getPercentOwned(){
+        return 100 * getTilesOwned().size() / (double)(height*width);
     }
 
     /**
@@ -102,13 +111,39 @@ abstract class Player {
         if(t.getContestedOwner() != null) {
             //System.out.println("Trail collision detected");
         }
+
     }
 
+    /**
+     * Get the players speed in x direction
+     * @return Players speed in x direction
+     */
     int getDx() {
         return dx;
     }
 
+    /**
+     * Get the players speed in y direction
+     * @return Players speed in y direction
+     */
     int getDy() {
         return dy;
+    }
+
+    /**
+     * Get name of player
+     * @return Name of player
+     */
+    String getName() {
+        return name;
+    }
+
+    /**
+     * Compares two players by the number of tiles owned.
+     * @param player Player to compare this to
+     * @return 1 if this owns more tiles than player, -1 if player owns more tiles than this or 0 otherwise
+     */
+    public int compareTo(Player player){
+        return Integer.compare(player.getTilesOwned().size(), tilesOwned.size());
     }
 }

@@ -1,6 +1,6 @@
 package se.liu.ida.paperio;
 
-import java.awt.Color;
+import java.awt.*;
 
 class Tile {
 
@@ -40,6 +40,10 @@ class Tile {
         }
     }
 
+    /**
+     * Blends two colors
+     * @return the blended color
+     */
     private Color blendColors(){
         float blendedRed = ((owner.getColor().getRed() / 255f) * (contestedOwner.getColor().getRed() / 255f));
         float blendedGreen = ((owner.getColor().getGreen() / 255f) * (contestedOwner.getColor().getGreen() / 255f));
@@ -55,27 +59,46 @@ class Tile {
         return contestedOwner;
     }
 
-    /** Sets a contester to Tile
+    /**
+     * Sets a contestant to Tile
      * @param contestedOwner Player that is contesting Tile
      */
     void setContestedOwner(Player contestedOwner) {
         this.contestedOwner = contestedOwner;
     }
 
+    /**
+     * Get owner of tile
+     * @return Player that is owner of tile
+     */
     Player getOwner() {
         return owner;
     }
 
+    /**
+     * Sets owner to owner of tile and removes current owner and current contested owner
+     * @param owner Player to be set as owner of tile
+     */
     void setOwner(Player owner) {
+        if(this.owner != null){
+            this.owner.removeTileOwned(this);
+        }
         this.owner = owner;
         contestedOwner = null;
-
     }
 
+    /**
+     * Get the tiles x-position
+     * @return The x-position of the tile
+     */
     int getX() {
         return x;
     }
 
+    /**
+     * Get the tiles y-position
+     * @return The y-position of the tile
+     */
     int getY() {
         return y;
     }

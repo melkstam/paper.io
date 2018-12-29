@@ -1,10 +1,11 @@
 package se.liu.ida.paperio;
 
 // TODO Cleanup imports
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class PaperIO extends JFrame implements ActionListener{
 
@@ -36,11 +37,18 @@ public class PaperIO extends JFrame implements ActionListener{
         add(cards);
     }
 
+    /**
+     * Enum with all possible game states
+     */
     private enum STATE{
         GAME,
         MENU
     }
 
+    /**
+     * Sets game state to specified state
+     * @param s STATE game should be set to
+     */
     private void setState(STATE s){
         CardLayout cardLayout = (CardLayout) cards.getLayout();
         if(s == STATE.GAME){
@@ -52,6 +60,10 @@ public class PaperIO extends JFrame implements ActionListener{
         }
     }
 
+    /**
+     * Reacts to game actions such as game start and game paused
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equals("Play Singleplayer")) {

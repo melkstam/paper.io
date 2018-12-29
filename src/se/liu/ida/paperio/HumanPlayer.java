@@ -1,13 +1,16 @@
 package se.liu.ida.paperio;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.Color;
+
 public class HumanPlayer extends Player {
 
 
-    HumanPlayer(int height, int width, Color color){
+    HumanPlayer(int height, int width, Color color, String name) {
         super(height, width, color);
+        this.name = name;
     }
+
 
 
     /**
