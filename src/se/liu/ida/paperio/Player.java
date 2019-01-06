@@ -1,6 +1,7 @@
 package se.liu.ida.paperio;
 
 import java.awt.*;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 abstract class Player implements Comparable<Player> {
@@ -15,6 +16,10 @@ abstract class Player implements Comparable<Player> {
     int height;
     int width;
     String name;
+
+    private Boolean isAlive = true;
+
+    private Tile currentTile;
 
     // TODO Make sure players start on a non-occupied spot
     Player(int height, int width, Color color){
@@ -48,12 +53,27 @@ abstract class Player implements Comparable<Player> {
         return color;
     }
 
-
     /**
      * Abstract method to move the player
      */
     abstract void move();
 
+    void death() {
+        isAlive = false;
+        ArrayList<Tile> ownedTilesCopy = (ArrayList<Tile>) tilesOwned.clone();
+        for(int i = 0; i < ownedTilesCopy.size(); i++){
+            ownedTilesCopy.get(i).setOwner(null);
+        }
+        tilesOwned = ownedTilesCopy;
+        System.out.println(tilesOwned.size());
+        for(int i = 0; i < tilesContested.size(); i++){
+            tilesContested.get(i).setOwner(null);
+        }
+        tilesOwned.clear();
+        tilesContested.clear();
+        currentTile = null;
+        System.out.println(name + " died.");
+    }
 
     /**
      * Add tile to players list of owned tiles
@@ -74,6 +94,10 @@ abstract class Player implements Comparable<Player> {
      */
     ArrayList<Tile> getTilesOwned(){
         return tilesOwned;
+    }
+
+    public void setTilesOwned(ArrayList<Tile> tilesOwned) {
+        this.tilesOwned = tilesOwned;
     }
 
     double getPercentOwned(){
@@ -109,9 +133,17 @@ abstract class Player implements Comparable<Player> {
 
     void checkCollision(Tile t){
         if(t.getContestedOwner() != null) {
-            //System.out.println("Trail collision detected");
+            System.out.println("Trail collision detected");
+            t.getContestedOwner().death();
         }
+    }
 
+    public Tile getCurrentTile() {
+        return currentTile;
+    }
+
+    public void setCurrentTile(Tile currentTile) {
+        this.currentTile = currentTile;
     }
 
     /**
@@ -136,6 +168,14 @@ abstract class Player implements Comparable<Player> {
      */
     String getName() {
         return name;
+    }
+
+    public Boolean getAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(Boolean alive) {
+        isAlive = alive;
     }
 
     /**
