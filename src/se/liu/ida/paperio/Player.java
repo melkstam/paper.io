@@ -1,7 +1,6 @@
 package se.liu.ida.paperio;
 
 import java.awt.*;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 abstract class Player implements Comparable<Player> {
@@ -64,6 +63,7 @@ abstract class Player implements Comparable<Player> {
         for(int i = 0; i < ownedTilesCopy.size(); i++){
             ownedTilesCopy.get(i).setOwner(null);
         }
+
         tilesOwned = ownedTilesCopy;
         System.out.println(tilesOwned.size());
         for(int i = 0; i < tilesContested.size(); i++){
@@ -133,16 +133,16 @@ abstract class Player implements Comparable<Player> {
 
     void checkCollision(Tile t){
         if(t.getContestedOwner() != null) {
-            System.out.println("Trail collision detected");
             t.getContestedOwner().death();
         }
     }
 
-    public Tile getCurrentTile() {
+
+    Tile getCurrentTile() {
         return currentTile;
     }
 
-    public void setCurrentTile(Tile currentTile) {
+    void setCurrentTile(Tile currentTile) {
         this.currentTile = currentTile;
     }
 
@@ -170,11 +170,11 @@ abstract class Player implements Comparable<Player> {
         return name;
     }
 
-    public Boolean getAlive() {
+    Boolean getAlive() {
         return isAlive;
     }
 
-    public void setAlive(Boolean alive) {
+    void setAlive(Boolean alive) {
         isAlive = alive;
     }
 

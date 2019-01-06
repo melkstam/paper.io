@@ -23,7 +23,7 @@ public class PaperIO extends JFrame implements ActionListener{
     private void initUI(){
 
         setSize(1000, 1000);
-        setResizable(false);
+        setResizable(true);
         setVisible(true);
         setTitle("paper.io");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,29 +62,31 @@ public class PaperIO extends JFrame implements ActionListener{
 
     /**
      * Reacts to game actions such as game start and game paused
-     * @param e
+     * @param e event to react to
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand().equals("Play Singleplayer")) {
-            board = new Board(this, menu.getP1Name());
-            cards.add(board, "board");
-            setState(STATE.GAME);
-        }else if(e.getActionCommand().equals("Play Multiplayer")){
-            board = new Board(this, menu.getP1Name(), menu.getP2Name());
-            cards.add(board, "board");
-            setState(STATE.GAME);
-        }else if(e.getActionCommand().equals("pause")){
-            setState(STATE.MENU);
+        switch (e.getActionCommand()) {
+            case "Play Singleplayer":
+                board = new Board(this, menu.getP1Name(), menu.getAreaHeight(), menu.getAreaWidth(), menu.getGameSpeed(), menu.getBotNumber());
+                cards.add(board, "board");
+                setState(STATE.GAME);
+                break;
+            case "Play Multiplayer":
+                board = new Board(this, menu.getP1Name(), menu.getP2Name(), menu.getAreaHeight(), menu.getAreaWidth(), menu.getGameSpeed(), menu.getBotNumber());
+                cards.add(board, "board");
+                setState(STATE.GAME);
+                break;
+            case "pause":
+                setState(STATE.MENU);
+                break;
         }
     }
 
     public static void main(String[] args) {
         System.setProperty("sun.java2d.opengl", "True");
 
-        EventQueue.invokeLater(() -> {
-            new PaperIO();
-        });
+        EventQueue.invokeLater(PaperIO::new);
     }
 
 }

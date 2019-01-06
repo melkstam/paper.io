@@ -14,24 +14,22 @@ public class Board extends JPanel {
 
     // TODO Fix scope of variables (private, public etc)
 
-    private int areaHeight = 100;
-    private int areaWidth = 100;
-    private int width;
-    private int height;
+    private int areaHeight;
+    private int areaWidth;
     private Tile[][] gameArea = new Tile[areaHeight][areaWidth];
+
+    private int botNumber;
     private List<Player> players = new ArrayList<>();
     private HumanPlayer humanPlayer;
-    private HashMap<Player, int[]> playerPositions = new HashMap<>();
     private HashMap<Player, Tile> playerCurrentPositions = new HashMap<>();
 
     private final int scale = 20;
     private int tickCounter = 0;
-    private final int tickReset = 8;
+    private int tickReset;
 
     private final int INITIAL_DELAY = 0;
     private final int PERIOD_INTERVAL = 1000/60;
 
-    private boolean splitScreen = false;
     private boolean paused = true;
 
     private String p1name;
@@ -47,21 +45,33 @@ public class Board extends JPanel {
             Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
             new Color(255,43,119), new Color(100,255,162)));
 
-    public Board(ActionListener actionListener, String p1name){
+    Board(ActionListener actionListener, String p1name, int areaHeight, int areaWidth, int gameSpeed, int botNumber){
         this.actionListener = actionListener;
         this.p1name = p1name;
+        this.areaHeight = areaHeight;
+        this.areaWidth = areaWidth;
+        this.botNumber = botNumber;
+        int[] speeds = {12, 10, 8, 6, 4};
+        tickReset = speeds[gameSpeed - 1];
         initBoard();
         painter = new Painter(getWidth(), getHeight(), scale, this, humanPlayer, players);
     }
 
-    public Board(ActionListener actionListener, String p1name, String p2name) {
+    Board(ActionListener actionListener, String p1name, String p2name, int areaHeight, int areaWidth, int gameSpeed, int botNumber) {
         this.actionListener = actionListener;
         this.p1name = p1name;
         this.p2name = p2name;
+        this.areaHeight = areaHeight;
+        this.areaWidth = areaWidth;
+        this.botNumber = botNumber;
+        int[] speeds = {12, 10, 8, 6, 4};
+        tickReset = speeds[gameSpeed - 1];
         initBoard();
     }
 
     private void initBoard(){
+        this.gameArea = new Tile[areaHeight][areaWidth];
+
         specifyKeyActions();
 
         for(int i = 0; i < gameArea.length; i++){
@@ -74,7 +84,7 @@ public class Board extends JPanel {
 
         players.add(new HumanPlayer(gameArea.length, gameArea[0].length, new Color((int)(Math.random() * 0x1000000)), p1name));
         humanPlayer = (HumanPlayer)players.get(0);
-        for(int i = 0; i < 0; i++){
+        for(int i = 0; i < botNumber; i++){
             if(i > 9){
                 players.add(new BotPlayer(gameArea.length,gameArea[0].length,
                         new Color((int)(Math.random() * 0x1000000))));
@@ -163,7 +173,7 @@ public class Board extends JPanel {
      */
     private void tick(){
         for (Player player : players) {
-            if(player.getAlive() == true) {
+            if(player.getAlive()) {
                 player.move();
                 try {
                     // If player is outside their owned territory, check if
@@ -175,8 +185,6 @@ public class Board extends JPanel {
                         player.checkCollision(gameArea[player.getX()][player.getY()]);
                         player.contestToOwned();
                         fillEnclosure(player);
-
-                        playerPositions.put(player, new int[]{player.getX(), player.getY()});
 
                     }
                     player.setCurrentTile(gameArea[player.getX()][player.getY()]);
@@ -358,7 +366,6 @@ public class Board extends JPanel {
 
     private class ScheduleTask extends TimerTask {
 
-        // TODO make tick separate method
         // TODO Fix player collision detections
         @Override
         public void run() {

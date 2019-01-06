@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 
-public class Painter extends JPanel {
+class Painter extends JPanel {
 
     private int width;
     private int height;
@@ -14,7 +14,7 @@ public class Painter extends JPanel {
     private Player humanPlayer;
     private Board board;
 
-    public Painter(int width, int height, int scale, Board board, Player humanPlayer, List<Player> players){
+    Painter(int width, int height, int scale, Board board, Player humanPlayer, List<Player> players){
        this.width = width;
        this.height = height;
        this.scale = scale;
@@ -23,18 +23,7 @@ public class Painter extends JPanel {
        this.humanPlayer = humanPlayer;
     }
 
-    /**
-     * Overrides paintComponent and is called whenever everything should be drawn on the screen
-     * @param g Graphics element used to draw elements on screen
-     */
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        draw(g);
-        Toolkit.getDefaultToolkit().sync();
-    }
-
-    public void draw(Graphics g){
+     void draw(Graphics g){
         width = board.getWidth();
         height = board.getHeight();
         drawGameArea(g);
@@ -99,7 +88,7 @@ public class Painter extends JPanel {
 
     /**
      * Draws the live scoreboard up in the rightmost corner
-     * @param g Graphics object recieved as argument in paintComponent method
+     * @param g Graphics object received as argument in paintComponent method
      */
     private void drawScoreboard(Graphics g) {
         g.setFont(new Font("Monospaced", Font.PLAIN, 16));
@@ -132,7 +121,4 @@ public class Painter extends JPanel {
         }
     }
 
-    public void tick(){
-        repaint();
-    }
 }
