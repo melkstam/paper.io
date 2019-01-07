@@ -7,6 +7,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
 
+/**
+ * Class responsible for displaying menu and receiving game settings. Uses an actionListener to forward actions from
+ * Menu.
+ */
 public class Menu extends JPanel{
 
     private JTextField p1NameFld;
@@ -20,6 +24,11 @@ public class Menu extends JPanel{
     private String[] names = {"Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", "Charizard", "Squirtle", "Wartortle", "Blastoise", "Caterpie", "Metapod", "Butterfree", "Weedle", "Kakuna", "Beedrill", "Pidgey", "Pidgeotto", "Pidgeot", "Rattata", "Raticate", "Spearow", "Fearow", "Ekans", "Arbok", "Pikachu", "Raichu", "Sandshrew", "Sandslash", "Nidoran", "Nidorina", "Nidoqueen", "Nidoran", "Nidorino", "Nidoking", "Clefairy", "Clefable", "Vulpix", "Ninetales", "Jigglypuff", "Wigglytuff", "Zubat", "Golbat", "Oddish", "Gloom", "Vileplume", "Paras", "Parasect", "Venonat", "Venomoth", "Diglett", "Dugtrio", "Meowth", "Persian", "Psyduck", "Golduck", "Mankey", "Primeape", "Growlithe", "Arcanine", "Poliwag", "Poliwhirl", "Poliwrath", "Abra", "Kadabra", "Alakazam", "Machop", "Machoke", "Machamp", "Bellsprout", "Weepinbell", "Victreebel", "Tentacool", "Tentacruel", "Geodude", "Graveler", "Golem", "Ponyta", "Rapidash", "Slowpoke", "Slowbro", "Magnemite", "Magneton", "Farfetch'd", "Doduo", "Dodrio", "Seel", "Dewgong", "Grimer", "Muk", "Shellder", "Cloyster", "Gastly", "Haunter", "Gengar", "Onix", "Drowzee", "Hypno", "Krabby", "Kingler", "Voltorb", "Electrode", "Exeggcute", "Exeggutor", "Cubone", "Marowak", "Hitmonlee", "Hitmonchan", "Lickitung", "Koffing", "Weezing", "Rhyhorn", "Rhydon", "Chansey", "Tangela", "Kangaskhan", "Horsea", "Seadra", "Goldeen", "Seaking", "Staryu", "Starmie", "Mr. Mime", "Scyther", "Jynx", "Electabuzz", "Magmar", "Pinsir", "Tauros", "Magikarp", "Gyarados", "Lapras", "Ditto", "Eevee", "Vaporeon", "Jolteon", "Flareon", "Porygon", "Omanyte", "Omastar", "Kabuto", "Kabutops", "Aerodactyl", "Snorlax", "Articuno", "Zapdos", "Moltres", "Dratini", "Dragonair", "Dragonite", "Mewtwo", "Mew"};
 
 
+
+    /**
+     * Initializes a menu with actionListener responsible for reacting to game start
+     * @param actionListener actionListener responsible for reacting to game start
+     */
     Menu(ActionListener actionListener){
         this.actionListener = actionListener;
         setBackground(Color.BLACK);
@@ -35,14 +44,17 @@ public class Menu extends JPanel{
      * Adds and styles all components in menu
      */
     private void addComponents(){
+        // Empty cells
         add(new JLabel(" "));
         add(new JLabel(" "));
 
+        // Play buttons
         JButton playBtn = new JButton("Play Singleplayer");
         JButton playMultiBtn = new JButton("Play Multiplayer");
 
         JButton[] buttons = {playBtn, playMultiBtn};
 
+        // Styles and add play buttons
         for(JButton button : buttons){
             button.setSize(100, 26);
             button.addActionListener(actionListener);
@@ -55,11 +67,13 @@ public class Menu extends JPanel{
             add(button);
         }
 
+        // Name labels
         JLabel p1name = new JLabel("Player 1 name:");
         JLabel p2name = new JLabel("Player 2 name:");
 
         JLabel[] labels = {p1name, p2name};
 
+        // Style and add labels
         for(JLabel label : labels){
             label.setFont(new Font("Monospaced", Font.PLAIN, 24));
             label.setForeground(Color.WHITE);
@@ -68,11 +82,13 @@ public class Menu extends JPanel{
             add(label);
         }
 
+        // Name text fields
         p1NameFld = new JTextField(names[new Random().nextInt(names.length)]);
         p2NameFld = new JTextField(names[new Random().nextInt(names.length)]);
 
         JTextField[] textFields = {p1NameFld, p2NameFld};
 
+        //Styles and adds name text fields
         for(JTextField textField : textFields){
             textField.setFont(new Font("Monospaced", Font.PLAIN, 40));
             textField.setBackground(Color.BLACK);
@@ -83,6 +99,7 @@ public class Menu extends JPanel{
             add(textField);
         }
 
+        // Setting labels and spinners
         JLabel areaHeightLabel = new JLabel("Game area height:");
         areaHeightSpnr = new JSpinner(new SpinnerNumberModel(100, 25, 500, 5));
         JLabel areaWidthLabel = new JLabel("Game area width:");
@@ -95,12 +112,14 @@ public class Menu extends JPanel{
         JLabel[] settingLabels = {areaHeightLabel, areaWidthLabel, speedLabel, botNumberLabel};
         JSpinner[] settingSpinners = {areaHeightSpnr, areaWidthSpnr, gameSpeedSpnr, botNumberSpnr};
 
+        // Style setting labels
         for(JLabel label : settingLabels){
             label.setFont(new Font("Monospaced", Font.PLAIN, 24));
             label.setForeground(Color.WHITE);
             label.setHorizontalAlignment(JLabel.RIGHT);
         }
 
+        // Style setting spinners
         for(JSpinner spinner : settingSpinners){
             JTextField textField = (JTextField)spinner.getEditor().getComponent(0);
             spinner.setFont(new Font("Monospaced", Font.PLAIN, 24));
@@ -114,6 +133,7 @@ public class Menu extends JPanel{
                 speedLabel, gameSpeedSpnr,
                 botNumberLabel, botNumberSpnr};
 
+        // Add setting labels and spinners
         for(JComponent component : settingComponents){
             add(component);
         }
@@ -170,7 +190,7 @@ public class Menu extends JPanel{
     }
 
     /**
-     * Mouse listener responsible for reacting on name text field clicks
+     * Mouse listener responsible for reacting on name text field clicks and clearing placeholder
      */
     class FieldMouseListener implements MouseListener {
 

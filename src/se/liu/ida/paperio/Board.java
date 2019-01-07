@@ -10,25 +10,29 @@ import java.util.Timer;
 import java.util.*;
 
 // TODO Comment code
+
+/**
+ * The board class is the class responsible for main game logic. This class initializes the tile grid, players and
+ * keeps track of them. Board is also specifies key bindings, fills enclosed areas and keeps track of a timer to tick
+ * through game logic. Board draws the live scoreboard but uses one or two Painter:s to draw the game area and players
+ * on it.
+ */
 public class Board extends JPanel {
 
     // TODO Fix scope of variables (private, public etc)
 
-    private int areaHeight;
-    private int areaWidth;
-    private Tile[][] gameArea = new Tile[areaHeight][areaWidth];
+    private final int areaHeight;
+    private final int areaWidth;
+    private Tile[][] gameArea;
+    private final int scale = 20;
 
-    private int botNumber;
+    private final int botNumber;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<HumanPlayer> humanPlayers = new ArrayList<>();
     private HashMap<Player, Tile> playerCurrentPositions = new HashMap<>();
 
-    private final int scale = 20;
     private int tickCounter = 0;
-    private int tickReset;
-
-    private final int INITIAL_DELAY = 0;
-    private final int PERIOD_INTERVAL = 1000/60;
+    private final int tickReset;
 
     private boolean paused = true;
     private ActionListener actionListener;
@@ -39,6 +43,15 @@ public class Board extends JPanel {
             Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
             new Color(255,43,119), new Color(100,255,162)));
 
+    /**
+     * Creates board for singleplayer
+     * @param actionListener listener for key presses and state updates
+     * @param p1name name of player
+     * @param areaHeight height of game area
+     * @param areaWidth width of game area
+     * @param gameSpeed game speed between 1 and 5, 5 being the fastest
+     * @param botNumber number of bots to have in game
+     */
     Board(ActionListener actionListener, String p1name, int areaHeight, int areaWidth, int gameSpeed, int botNumber){
         this.actionListener = actionListener;
         this.areaHeight = areaHeight;
@@ -55,6 +68,16 @@ public class Board extends JPanel {
         painters.add(new Painter(scale, this, humanPlayers.get(0), players));
     }
 
+    /**
+     * Creates board for multiplayer
+     * @param actionListener listener for key presses and state updates
+     * @param p1name name of player 1
+     * @param p2name name of player 2
+     * @param areaHeight height of game area
+     * @param areaWidth width of game area
+     * @param gameSpeed game speed between 1 and 5, 5 being the fastest
+     * @param botNumber number of bots to have in game
+     */
     Board(ActionListener actionListener, String p1name, String p2name, int areaHeight, int areaWidth, int gameSpeed, int botNumber) {
         this.actionListener = actionListener;
         this.areaHeight = areaHeight;
@@ -74,19 +97,22 @@ public class Board extends JPanel {
         painters.add(new Painter(scale, this, humanPlayers.get(1), players));
     }
 
+    /**
+     * Initializes necessary variables, timer, players etc required for the board
+     */
     private void initBoard(){
         this.gameArea = new Tile[areaHeight][areaWidth];
-
-        specifyKeyActions();
-
         for(int i = 0; i < gameArea.length; i++){
             for(int j = 0; j < gameArea[i].length; j++){
                 gameArea[i][j] = new Tile(j,i);
             }
         }
 
+        specifyKeyActions();
+
         setBackground(Color.BLACK);
 
+        // Adds new bots and give them a color either from colorList or randomized
         for(int i = 0; i < botNumber; i++){
             if(i > 9){
                 players.add(new BotPlayer(gameArea.length,gameArea[0].length,
@@ -99,13 +125,16 @@ public class Board extends JPanel {
             startingArea(player);
         }
 
+        // Starts a timer to tick the game logic
+        final int INITIAL_DELAY = 0;
+        final int PERIOD_INTERVAL = 1000/60;
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(),
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
 
     /**
-     * Specifies necessary key bindings and key actions for game to work.
+     * Specifies necessary key bindings and key actions for game
      */
     private void specifyKeyActions(){
         InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
@@ -186,8 +215,8 @@ public class Board extends JPanel {
     }
 
     /**
-     * Marks all tiles in the starting area of a player to owned by player.
-     * @param player Player
+     * Marks all tiles in the starting area of a player to owned by player
+     * @param player player to generate starting area for
      */
     private void startingArea(Player player){
         int x = player.getX();
@@ -259,13 +288,14 @@ public class Board extends JPanel {
     }
 
     /**
-     * Method responsible for main logic of the game
+     * Method responsible for main logic of the game. Checks collisions and if enclosures should be filled.
      */
     private void tick(){
         for (Player player : players) {
             if(player.getAlive()) {
                 player.move();
                 try {
+                    Tile tile = getTile(player.getX(), player.getY());
                     // If player is outside their owned territory, check if
                     if (gameArea[player.getX()][player.getY()].getOwner() != player) {
                         player.checkCollision(gameArea[player.getX()][player.getY()]);
@@ -275,12 +305,11 @@ public class Board extends JPanel {
                         player.checkCollision(gameArea[player.getX()][player.getY()]);
                         player.contestToOwned();
                         fillEnclosure(player);
-
                     }
                     player.setCurrentTile(gameArea[player.getX()][player.getY()]);
                     playerCurrentPositions.put(player, gameArea[player.getX()][player.getY()]);
                     findCollision();
-                } catch (ArrayIndexOutOfBoundsException e) {
+                } catch (ArrayIndexOutOfBoundsException ignored) {
                 }
             }
         }
@@ -483,9 +512,15 @@ public class Board extends JPanel {
         return gameArea[y][x];
     }
 
+    /**
+     * ScheduleTask is responsible for receiving and responding to timer calls
+     */
     private class ScheduleTask extends TimerTask {
 
         // TODO Fix player collision detections
+        /**
+         * Gets called by timer at specified interval. Calls tick at specified rate and repaint each time
+         */
         @Override
         public void run() {
             if(!paused) {

@@ -2,6 +2,10 @@ package se.liu.ida.paperio;
 
 import java.awt.*;
 
+/**
+ * A tile in the game area. A tile has an x and y position, a color. It can also have a player as owner and a player
+ * as contested owner. A tiles color does depend on owner and contested owner.
+ */
 class Tile {
 
     private Player owner;
@@ -10,14 +14,19 @@ class Tile {
     private int x;
     private int y;
 
+    /**
+     * Initializes a tile at position (x, y)
+     * @param x x position of the tile
+     * @param y y position of the tile
+     */
     Tile(int x, int y){
         this.x = x;
         this.y = y;
     }
 
     /**
-     * Decides what color to be drawn on the Tile a player is on
-     * @return The color that is going to be drawn
+     * Decides what color to be drawn depending on owner and contested owner
+     * @return color of the tile
      */
     Color getColor(){
         // If a Tile has an owner and Tile is not being contested,
@@ -41,7 +50,7 @@ class Tile {
     }
 
     /**
-     * Blends two colors
+     * Blends colors of owner and contested owner
      * @return the blended color
      */
     private Color blendColors(){
@@ -60,7 +69,7 @@ class Tile {
     }
 
     /**
-     * Sets a contestant to Tile
+     * Sets a player as contestant to Tile
      * @param contestedOwner Player that is contesting Tile
      */
     void setContestedOwner(Player contestedOwner) {
@@ -76,7 +85,7 @@ class Tile {
     }
 
     /**
-     * Sets owner to owner of tile and removes current owner and current contested owner
+     * Sets owner to owner of tile and removes current owner and contested owner
      * @param owner Player to be set as owner of tile
      */
     void setOwner(Player owner) {

@@ -19,7 +19,8 @@ När en spelare går med hamnar man på en slumpmässig server med andra spelare
 
 ### Icke-funktionella krav
 * Spelet ska vara skrivet i Java.
-* Programmet ska ha en god objektorienterad design. * Designen ska finnas dokumenterad, t.ex. i diagramform.
+* Programmet ska ha en god objektorienterad design.
+* Designen ska finnas dokumenterad, t.ex. i diagramform.
 * Programmet ska vara så lätt att lära sig att en normalbegåvad labbassistent kan hantera det efter några minuters utbildning.
 
 ### Ideer till ytterligare funktionalitet

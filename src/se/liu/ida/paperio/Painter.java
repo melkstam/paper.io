@@ -1,18 +1,28 @@
 package se.liu.ida.paperio;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-class Painter extends JPanel {
+/**
+ * A Painter is responsible for drawing the game area. Multiple painters can be used to draw the game area from
+ * different players views.
+ */
+class Painter{
 
     private int width;
     private int height;
-    private int scale;
+    private final int scale;
     private List<Player> players;
     private Player humanPlayer;
     private Board board;
 
+    /**
+     * Create a new painter with scale, board which state to be drawn, player to follow and all players
+     * @param scale how much a tile should be scaled from one pixel
+     * @param board board which state to be drawn
+     * @param humanPlayer player to follow from which view the game area and player should be drawn
+     * @param players all players that at each time should be drawn
+     */
     Painter(int scale, Board board, Player humanPlayer, List<Player> players){
        this.scale = scale;
        this.board = board;
@@ -20,6 +30,10 @@ class Painter extends JPanel {
        this.humanPlayer = humanPlayer;
     }
 
+    /**
+     * Method is called from board to initialize a draw with graphics received
+     * @param g graphics object used to draw
+     */
      void draw(Graphics g){
         height = g.getClipBounds().height;
         width = g.getClipBounds().width;
@@ -28,8 +42,6 @@ class Painter extends JPanel {
     }
 
     // TODO Print name under player
-    // TODO Only interpolate drawPlayers and not gameArea (Optimize)
-    // TODO interpolate non-human players
     /**
      * Draws all players on the map with corresponding colors. Doesn't draw players not seen by player.
      * @param g Graphics object received as argument in paintComponent method
@@ -39,15 +51,19 @@ class Painter extends JPanel {
         int drawY;
 
         for (Player player : players) {
+            // x and y position relative to humanPlayer at which player should be drawn
             drawX = (player.getX() - humanPlayer.getX()) * scale + ((width - scale) / 2);
             drawY = (player.getY() - humanPlayer.getY()) * scale + ((height - scale) / 2);
             if (player != humanPlayer) {
+                // For all other players than humanPlayer we need to smooth animations regarding to animation smoothing
+                // of humanPlayer
                 drawX += ((player.getDx() - humanPlayer.getDx()) * scale
                         * ((board.getTickCounter() + 1) / (double) board.getTickReset()));
                 drawY += ((player.getDy() - humanPlayer.getDy()) * scale
                         * ((board.getTickCounter() + 1) / (double) board.getTickReset()));
             }
 
+            // Draw player if visible
             if (!(drawX + scale < 0 || drawX > width || drawY + scale < 0 || drawY > height)) {
                 g.setColor(player.getColor());
                 g.fillRect(drawX, drawY, scale, scale);
@@ -66,6 +82,7 @@ class Painter extends JPanel {
 
         for (int i = 0; i < board.getAreaHeight(); i++) {
             for (int j = 0; j < board.getAreaWidth(); j++) {
+                // x and y position relative to humanPlayer at which tile should be drawn
                 drawX = (i - humanPlayer.getX()) * scale + ((width - scale) / 2)
                         + (int) ((-humanPlayer.getDx()) * scale *
                         ((board.getTickCounter() + 1) / (double) board.getTickReset()));
@@ -73,6 +90,7 @@ class Painter extends JPanel {
                         + (int) ((-humanPlayer.getDy()) * scale *
                         ((board.getTickCounter() + 1) / (double) board.getTickReset()));
 
+                // If visible, draw first white background and then draw color on top
                 if (!(drawX + scale < 0 || drawX > width || drawY + scale < 0 || drawY > height)) {
                     g.setColor(Color.white);
                     g.fillRect(drawX, drawY, scale, scale);
@@ -83,6 +101,5 @@ class Painter extends JPanel {
             }
         }
     }
-
 
 }

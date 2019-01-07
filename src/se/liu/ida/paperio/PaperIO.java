@@ -7,6 +7,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * PaperIO is the main class used to start window and keep track of current state and switch between states.
+ */
 public class PaperIO extends JFrame implements ActionListener{
 
     private Board board;
@@ -15,10 +18,16 @@ public class PaperIO extends JFrame implements ActionListener{
 
     private STATE state;
 
+    /**
+     * Initializes a new occurrence of game
+     */
     private PaperIO(){
         initUI();
     }
 
+    /**
+     * Specifies size, title and layout etc for game
+     */
     private void initUI(){
 
         setSize(1000, 1000);

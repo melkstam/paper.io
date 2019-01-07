@@ -3,6 +3,11 @@ package se.liu.ida.paperio;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * An abstract class for a general player in the game. Human player and bot player differs a bit but their common logic
+ * is specified here. It keeps track of players position, speed, color, owned and contested tiles and name. Two players
+ * can also be compared that compares number of owned tiles of the player.
+ */
 abstract class Player implements Comparable<Player> {
 
     int x;
@@ -21,6 +26,13 @@ abstract class Player implements Comparable<Player> {
     private Tile currentTile;
 
     // TODO Make sure players start on a non-occupied spot
+
+    /**
+     * Initializes a player on a random spot on the game area with specified color
+     * @param height height of game area player is constructed in
+     * @param width width of game area player is constructed in
+     * @param color the color of the player
+     */
     Player(int height, int width, Color color){
         x = (int)(Math.random() * (width - 2) +1);
         y = (int)(Math.random() * (height - 2) +1);
@@ -57,6 +69,9 @@ abstract class Player implements Comparable<Player> {
      */
     abstract void move();
 
+    /**
+     * Logic for when player gets killed
+     */
     void death() {
         isAlive = false;
         ArrayList<Tile> ownedTilesCopy = (ArrayList<Tile>) tilesOwned.clone();
@@ -83,6 +98,10 @@ abstract class Player implements Comparable<Player> {
         t.setOwner(this);
     }
 
+    /**
+     * Remove a tile from owned
+     * @param t tile to be removed from owned
+     */
     void removeTileOwned(Tile t){
         tilesOwned.remove(t);
     }
@@ -95,10 +114,10 @@ abstract class Player implements Comparable<Player> {
         return tilesOwned;
     }
 
-    public void setTilesOwned(ArrayList<Tile> tilesOwned) {
-        this.tilesOwned = tilesOwned;
-    }
-
+    /**
+     * Get as a percentage how much of the total game area a player owns
+     * @return percentage of how much of the total game area a player owns
+     */
     double getPercentOwned(){
         return 100 * getTilesOwned().size() / (double)(height*width);
     }
@@ -130,17 +149,28 @@ abstract class Player implements Comparable<Player> {
         tilesContested.clear();
     }
 
+    /**
+     * Kills the player contesting a tile when travelling on it
+     * @param t tile which contested owner should get killed
+     */
     void checkCollision(Tile t){
         if(t.getContestedOwner() != null) {
             t.getContestedOwner().death();
         }
     }
 
-
+    /**
+     * Get current tile player is on
+     * @return Tile player is on currently
+     */
     Tile getCurrentTile() {
         return currentTile;
     }
 
+    /**
+     * Set tile to be current tile
+     * @param currentTile tile to be set as current tile
+     */
     void setCurrentTile(Tile currentTile) {
         this.currentTile = currentTile;
     }
