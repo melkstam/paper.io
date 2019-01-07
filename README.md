@@ -36,3 +36,32 @@ När en spelare går med hamnar man på en slumpmässig server med andra spelare
 ## Dokumentation
 [Javadocs](https://vilhelmmelkstam.github.io/paper.io) finns tillgängligt.
 
+### Övergripande kodstruktur
+UML-diagrammet ser ut såhär:
+![UML-diagram](/Users/melkstam/Google Drive/LiTH/TDDC77/Projekt - Paper.io/paperio-uml.png)
+
+Projektet består av åtta stycken klasser; `PaperIO`, `Menu`, `Board`, `Painter`, `Player`, `HumanPlayer`, `BotPlayer` och `Tile`. 
+
+#### [PaperIO](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/PaperIO.html)
+`PaperIO` är huvudklassen med `main`-metoden. Denna klass ansvarar för att skapa och styra över fönster samt hålla koll på nuvarande `STATE` samt att byta mellan olika `STATE`:s. 
+
+#### [Menu](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/Menu.html)
+`PaperIO` har en `Menu` som är huvudmenyn och ansvarar för att ta emot spelinställningar och starttryckning.
+
+#### [Board](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/Board.html)
+`Board` är logikklassen för spelet och ansvarar för spelets logik. `Board` skapar och administrerar spelplan, spelare och knappbindningar. Har även en timer för att uppdatera logiken i ticks. Klassen har en eller två `Painter`:s.
+
+#### [Painter](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/Painter.html)
+`Painter` används av `Board` för att rita spelplanen och spelare på den. En `Painter` ritar utifrån ens `Player`:s perspektiv och det den ser. Två `Painter`:s används för att visa splitscreen.
+
+#### [Player](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/Player.html)
+`Player` är en abstrakt klass som sköter all grundläggande logik för spelare. Det enda som skiljer sig åt mellan de klasser som ärver från `Player` är vad som får dem att röra på sig. Resten av logiken så som att hålla koll på namn, färg, ägda och omstridda `Tile`s, position och hastighetens riktning m.m.
+
+#### [HumanPlayer](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/HumanPlayer.html)
+`HumanPlayer` ärver från `Player` och är en spelare som kontrolleras av en männinska via tangentbordet. `HumanPlayer` ansvarar för att hålla koll på vilken riktning den ska röra sig i nästa tick samt att sedan röra sig enligt det.
+
+#### [BotPlayer](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/BotPlayer.html)
+`BotPlayer` ärver från `Player` och är en datorstyrd spelare. `BotPlayer` har logik för att bestämma riktning för att inte åka utanför banan men är annars slumpmässigt styrd.
+
+#### [Tile](https://vilhelmmelkstam.github.io/paper.io/se/liu/ida/paperio/Tile.html)
+`Tile` är en ruta i rutnätet. En `Tile` har en färg, en position och kan ha en ägare och en omstridd ägare. Dess färg beror på ägare och omstridd ägare.
