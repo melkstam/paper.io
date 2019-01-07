@@ -26,6 +26,10 @@ När en spelare går med hamnar man på en slumpmässig server med andra spelare
 * Local multiplayer för fler spelare.
 * Online multiplayer för fler spelare. (Väldigt extra funktionalitet)
 * Smartare bots som analyserar närheten för att avgöra rörelser.
+* Styra storlek på banan, antal datorspelare och hastighet själv.
+* Möjlighet att spela med Power-Ups.
+* Spara och visa highscores.
+
 
 
 ## Dokumentation
