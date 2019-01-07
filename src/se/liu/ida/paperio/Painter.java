@@ -43,12 +43,15 @@ class Painter{
 
     // TODO Print name under player
     /**
-     * Draws all players on the map with corresponding colors. Doesn't draw players not seen by player.
+     * Draws all players and their name on the map with corresponding color. Doesn't draw players not seen by player.
      * @param g Graphics object received as argument in paintComponent method
      */
     private void drawPlayers(Graphics g){
         int drawX;
         int drawY;
+
+        g.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        FontMetrics fontMetrics = g.getFontMetrics();
 
         for (Player player : players) {
             // x and y position relative to humanPlayer at which player should be drawn
@@ -63,6 +66,10 @@ class Painter{
                         * ((board.getTickCounter() + 1) / (double) board.getTickReset()));
             }
 
+            g.setColor(Color.BLACK);
+            g.drawString(player.getName(),
+                    drawX + (scale - fontMetrics.stringWidth(player.getName()))/2, drawY+scale+16);
+
             // Draw player if visible
             if (!(drawX + scale < 0 || drawX > width || drawY + scale < 0 || drawY > height)) {
                 g.setColor(player.getColor());
@@ -75,7 +82,7 @@ class Painter{
      * Draws all tiles on the map with colors corresponding to owner and contested owner. Doesn't draw tiles not seen by
      * player.
      * @param g Graphics object received as argument in paintComponent method
-     */
+      */
     private void drawGameArea(Graphics g) {
         int drawX;
         int drawY;

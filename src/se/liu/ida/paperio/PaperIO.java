@@ -1,7 +1,5 @@
 package se.liu.ida.paperio;
 
-// TODO Cleanup imports
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

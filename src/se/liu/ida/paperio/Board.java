@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.*;
 
-// TODO Comment code
-
 /**
  * The board class is the class responsible for main game logic. This class initializes the tile grid, players and
  * keeps track of them. Board is also specifies key bindings, fills enclosed areas and keeps track of a timer to tick
@@ -18,8 +16,6 @@ import java.util.*;
  * on it.
  */
 public class Board extends JPanel {
-
-    // TODO Fix scope of variables (private, public etc)
 
     private final int areaHeight;
     private final int areaWidth;
