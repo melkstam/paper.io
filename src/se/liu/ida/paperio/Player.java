@@ -31,7 +31,7 @@ abstract class Player implements Comparable<Player> {
 
     /**
      * The x position in the tile system
-     * @return      x position in the tile system
+     * @return x position in the tile system
      */
     int getX(){
         return x;
@@ -39,7 +39,7 @@ abstract class Player implements Comparable<Player> {
 
     /**
      * The y position in the tile system
-     * @return      y position in the tile system
+     * @return y position in the tile system
      */
     int getY(){
         return y;
@@ -65,14 +65,13 @@ abstract class Player implements Comparable<Player> {
         }
 
         tilesOwned = ownedTilesCopy;
-        System.out.println(tilesOwned.size());
         for(int i = 0; i < tilesContested.size(); i++){
             tilesContested.get(i).setOwner(null);
         }
         tilesOwned.clear();
         tilesContested.clear();
         currentTile = null;
-        System.out.println(name + " died.");
+
     }
 
     /**
@@ -170,12 +169,12 @@ abstract class Player implements Comparable<Player> {
         return name;
     }
 
+    /**
+     * Get alive state of player
+     * @return alive state of player
+     */
     Boolean getAlive() {
         return isAlive;
-    }
-
-    void setAlive(Boolean alive) {
-        isAlive = alive;
     }
 
     /**

@@ -19,7 +19,6 @@ public class PaperIO extends JFrame implements ActionListener{
         initUI();
     }
 
-    // TODO Add possibility for local multiplayer (split screen)
     private void initUI(){
 
         setSize(1000, 1000);
@@ -29,7 +28,6 @@ public class PaperIO extends JFrame implements ActionListener{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        //board = new Board(this);
         menu = new Menu(this);
         cards = new JPanel(new CardLayout());
         cards.add(menu, "menu");

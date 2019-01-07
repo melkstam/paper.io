@@ -19,8 +19,8 @@ public class Board extends JPanel {
     private Tile[][] gameArea = new Tile[areaHeight][areaWidth];
 
     private int botNumber;
-    private List<Player> players = new ArrayList<>();
-    private HumanPlayer humanPlayer;
+    private ArrayList<Player> players = new ArrayList<>();
+    private ArrayList<HumanPlayer> humanPlayers = new ArrayList<>();
     private HashMap<Player, Tile> playerCurrentPositions = new HashMap<>();
 
     private final int scale = 20;
@@ -31,15 +31,9 @@ public class Board extends JPanel {
     private final int PERIOD_INTERVAL = 1000/60;
 
     private boolean paused = true;
-
-    private String p1name;
-    private String p2name;
-
-    private int keyToSend;
     private ActionListener actionListener;
 
-    private Painter painter;
-
+    private ArrayList<Painter> painters = new ArrayList<>();
 
     private List<Color> colorList = new ArrayList<>(Arrays.asList(Color.magenta, Color.green, Color.red,
             Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
@@ -47,26 +41,37 @@ public class Board extends JPanel {
 
     Board(ActionListener actionListener, String p1name, int areaHeight, int areaWidth, int gameSpeed, int botNumber){
         this.actionListener = actionListener;
-        this.p1name = p1name;
         this.areaHeight = areaHeight;
         this.areaWidth = areaWidth;
         this.botNumber = botNumber;
         int[] speeds = {12, 10, 8, 6, 4};
         tickReset = speeds[gameSpeed - 1];
+
+        players.add(new HumanPlayer(areaHeight, areaWidth, new Color((int)(Math.random() * 0x1000000)), p1name));
+        humanPlayers.add((HumanPlayer)players.get(0));
+
         initBoard();
-        painter = new Painter(getWidth(), getHeight(), scale, this, humanPlayer, players);
+
+        painters.add(new Painter(scale, this, humanPlayers.get(0), players));
     }
 
     Board(ActionListener actionListener, String p1name, String p2name, int areaHeight, int areaWidth, int gameSpeed, int botNumber) {
         this.actionListener = actionListener;
-        this.p1name = p1name;
-        this.p2name = p2name;
         this.areaHeight = areaHeight;
         this.areaWidth = areaWidth;
         this.botNumber = botNumber;
         int[] speeds = {12, 10, 8, 6, 4};
         tickReset = speeds[gameSpeed - 1];
+
+        players.add(new HumanPlayer(areaHeight, areaWidth, new Color((int)(Math.random() * 0x1000000)), p1name));
+        players.add(new HumanPlayer(areaHeight, areaWidth, new Color((int)(Math.random() * 0x1000000)), p2name));
+        humanPlayers.add((HumanPlayer)players.get(0));
+        humanPlayers.add((HumanPlayer)players.get(1));
+
         initBoard();
+
+        painters.add(new Painter(scale, this, humanPlayers.get(0), players));
+        painters.add(new Painter(scale, this, humanPlayers.get(1), players));
     }
 
     private void initBoard(){
@@ -82,8 +87,6 @@ public class Board extends JPanel {
 
         setBackground(Color.BLACK);
 
-        players.add(new HumanPlayer(gameArea.length, gameArea[0].length, new Color((int)(Math.random() * 0x1000000)), p1name));
-        humanPlayer = (HumanPlayer)players.get(0);
         for(int i = 0; i < botNumber; i++){
             if(i > 9){
                 players.add(new BotPlayer(gameArea.length,gameArea[0].length,
@@ -108,30 +111,70 @@ public class Board extends JPanel {
         InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = getActionMap();
 
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "moveUP");
-        am.put("moveUP", new AbstractAction() {
-            public void actionPerformed(ActionEvent evt) {
-                keyToSend = KeyEvent.VK_UP;
-            }
-        });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "moveDOWN");
-        am.put("moveDOWN", new AbstractAction() {
-            public void actionPerformed(ActionEvent evt) {
-                keyToSend = KeyEvent.VK_DOWN;
-            }
-        });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "moveLEFT");
-        am.put("moveLEFT", new AbstractAction() {
-            public void actionPerformed(ActionEvent evt) {
-                keyToSend = KeyEvent.VK_LEFT;
-            }
-        });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "moveRIGHT");
-        am.put("moveRIGHT", new AbstractAction() {
-            public void actionPerformed(ActionEvent evt) {
-                keyToSend = KeyEvent.VK_RIGHT;
-            }
-        });
+        if(humanPlayers.size() == 1){
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "moveUP");
+            am.put("moveUP", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(0).setNextKey(KeyEvent.VK_UP);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "moveDOWN");
+            am.put("moveDOWN", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) {humanPlayers.get(0).setNextKey(KeyEvent.VK_DOWN);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "moveLEFT");
+            am.put("moveLEFT", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(0).setNextKey(KeyEvent.VK_LEFT);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "moveRIGHT");
+            am.put("moveRIGHT", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(0).setNextKey(KeyEvent.VK_RIGHT);
+                }
+            });
+        }else if(humanPlayers.size() == 2){
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "moveP1UP");
+            am.put("moveP1UP", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(1).setNextKey(KeyEvent.VK_UP);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "moveP1DOWN");
+            am.put("moveP1DOWN", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) {humanPlayers.get(1).setNextKey(KeyEvent.VK_DOWN);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "moveP1LEFT");
+            am.put("moveP1LEFT", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(1).setNextKey(KeyEvent.VK_LEFT);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "moveP1RIGHT");
+            am.put("moveP1RIGHT", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(1).setNextKey(KeyEvent.VK_RIGHT);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "moveP2UP");
+            am.put("moveP2UP", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(0).setNextKey(KeyEvent.VK_W);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "moveP2DOWN");
+            am.put("moveP2DOWN", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) {humanPlayers.get(0).setNextKey(KeyEvent.VK_S);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "moveP2LEFT");
+            am.put("moveP2LEFT", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(0).setNextKey(KeyEvent.VK_A);
+                }
+            });
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "moveP2RIGHT");
+            am.put("moveP2RIGHT", new AbstractAction() {
+                public void actionPerformed(ActionEvent evt) { humanPlayers.get(0).setNextKey(KeyEvent.VK_D);
+                }
+            });
+        }
+
 
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "pause");
         am.put("pause", new AbstractAction() {
@@ -156,7 +199,6 @@ public class Board extends JPanel {
         }
     }
 
-    // TODO call paintComponent/repaint from Painter
     /**
      * Overrides paintComponent and is called whenever everything should be drawn on the screen
      * @param g Graphics element used to draw elements on screen
@@ -164,8 +206,56 @@ public class Board extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        painter.draw(g);
+        for(int i = 0; i < painters.size(); i++){
+            //Set clipping area for painter
+            g.setClip(getWidth()/painters.size() * i,0,getWidth()/painters.size(),getHeight());
+
+            //Move graphics to top-left of clipping area
+            g.translate(getWidth()/painters.size() * i,0);
+
+            //Painter paints area
+            painters.get(i).draw(g);
+
+            //Move graphics back to top-left of window
+            g.translate(-getWidth()/painters.size() * i,0);
+        }
+        drawScoreboard(g);
         Toolkit.getDefaultToolkit().sync();
+    }
+
+    /**
+     * Draws the live scoreboard up in the rightmost corner
+     * @param g Graphics object received as argument in paintComponent method
+     */
+    private void drawScoreboard(Graphics g) {
+        g.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        FontMetrics fontMetrics = g.getFontMetrics();
+        int fontHeight = fontMetrics.getHeight();
+        int barWidth;
+        int barHeight = fontHeight + 4;
+
+        Player player;
+        String string;
+        Color color;
+
+        double highestPercentOwned = players.get(0).getPercentOwned();
+        Collections.sort(players);
+        for(int i = 0; i < Integer.min(5, players.size()); i++){
+            player = players.get(i);
+            string = String.format("%.2f%% - " + player.getName(), player.getPercentOwned());
+            color = player.getColor();
+
+            barWidth = (int)((player.getPercentOwned() / highestPercentOwned)*(getWidth()/4));
+            g.setColor(player.getColor());
+            g.fillRect(getWidth() - barWidth,  barHeight*i, barWidth,barHeight);
+            // If color is perceived as dark set the font color to white, else black
+            if(0.299*color.getRed() + 0.587*color.getGreen() + 0.114*color.getBlue() < 127){
+                g.setColor(Color.WHITE);
+            }else{
+                g.setColor(Color.BLACK);
+            }
+            g.drawString(string, 2+getWidth() -  barWidth,  barHeight*i + fontHeight);
+        }
     }
 
     /**
@@ -195,9 +285,8 @@ public class Board extends JPanel {
             }
         }
 
-        if(keyToSend != 0){
-            humanPlayer.keyPressed(keyToSend);
-            keyToSend = 0;
+        for(HumanPlayer humanPlayer : humanPlayers){
+            humanPlayer.updateD();
         }
     }
 
@@ -348,20 +437,50 @@ public class Board extends JPanel {
      * Set board to paused mode, meaning logic and graphics are not updated
      * @param b True if game should be paused, false otherwise
      */
-    public void setPaused(Boolean b){
+    void setPaused(Boolean b){
         paused = b;
     }
 
-    public Tile[][] getGameArea() {
-        return gameArea;
+    /**
+     * Get height of game area
+     * @return height of game area
+     */
+    int getAreaHeight() {
+        return areaHeight;
     }
 
-    public int getTickCounter() {
+    /**
+     * Get width of game area
+     * @return width of game area
+     */
+    int getAreaWidth() {
+        return areaWidth;
+    }
+
+    /**
+     * Get current tick counter
+     * @return current tick counter
+     */
+    int getTickCounter() {
         return tickCounter;
     }
 
-    public int getTickReset() {
+    /**
+     * Get how often tick is reset, impacting speed of game
+     * @return how often tick is reset
+     */
+    int getTickReset() {
         return tickReset;
+    }
+
+    /**
+     * Get tile at position (x,y)
+     * @param x x position of tile
+     * @param y y position of tile
+     * @return tile at position (x,y)
+     */
+    Tile getTile(int x, int y){
+        return gameArea[y][x];
     }
 
     private class ScheduleTask extends TimerTask {
