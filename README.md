@@ -38,7 +38,7 @@ När en spelare går med hamnar man på en slumpmässig server med andra spelare
 
 ### Övergripande kodstruktur
 UML-diagrammet ser ut såhär:
-![UML-diagram](/Users/melkstam/Google Drive/LiTH/TDDC77/Projekt - Paper.io/paperio-uml.png)
+![UML-diagram](docs/paperio-uml.png)
 
 Projektet består av åtta stycken klasser; `PaperIO`, `Menu`, `Board`, `Painter`, `Player`, `HumanPlayer`, `BotPlayer` och `Tile`. 
 

@@ -14,8 +14,6 @@ public class PaperIO extends JFrame implements ActionListener{
     private Menu menu;
     private JPanel cards;
 
-    private STATE state;
-
     /**
      * Initializes a new occurrence of game
      */
