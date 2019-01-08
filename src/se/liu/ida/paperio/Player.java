@@ -39,6 +39,21 @@ abstract class Player implements Comparable<Player> {
         this.color = color;
         this.height = height;
         this.width = width;
+
+        double rand = Math.random();
+        if (rand < 0.25) {
+            dx = 1;
+            dy = 0;
+        } else if (rand < 5) {
+            dx = -1;
+            dy = 0;
+        } else if (rand < 0.75) {
+            dx = 0;
+            dy = 1;
+        } else {
+            dx = 0;
+            dy = -1;
+        }
     }
 
     /**
@@ -72,16 +87,16 @@ abstract class Player implements Comparable<Player> {
     /**
      * Logic for when player gets killed
      */
-    void death() {
+    void die() {
         isAlive = false;
-        ArrayList<Tile> ownedTilesCopy = (ArrayList<Tile>) tilesOwned.clone();
+        ArrayList<Tile> ownedTilesCopy = (ArrayList<Tile>)tilesOwned.clone();
+        ArrayList<Tile> contestedTilesCopy = (ArrayList<Tile>)tilesContested.clone();
         for(int i = 0; i < ownedTilesCopy.size(); i++){
             ownedTilesCopy.get(i).setOwner(null);
         }
 
-        tilesOwned = ownedTilesCopy;
-        for(int i = 0; i < tilesContested.size(); i++){
-            tilesContested.get(i).setOwner(null);
+        for(int i = 0; i < contestedTilesCopy.size(); i++){
+            contestedTilesCopy.get(i).setContestedOwner(null);
         }
         tilesOwned.clear();
         tilesContested.clear();
@@ -96,6 +111,7 @@ abstract class Player implements Comparable<Player> {
     void setTileOwned(Tile t){
         tilesOwned.add(t);
         t.setOwner(this);
+        t.setContestedOwner(null);
     }
 
     /**
@@ -155,7 +171,7 @@ abstract class Player implements Comparable<Player> {
      */
     void checkCollision(Tile t){
         if(t.getContestedOwner() != null) {
-            t.getContestedOwner().death();
+            t.getContestedOwner().die();
         }
     }
 

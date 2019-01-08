@@ -20,21 +20,6 @@ class BotPlayer extends Player{
     BotPlayer(int height, int width, Color color){
         super(height, width, color);
         this.name = names[new Random().nextInt(names.length)];
-
-        double rand = Math.random();
-        if (rand < 0.25) {
-            dx = 1;
-            dy = 0;
-        } else if (rand < 5) {
-            dx = -1;
-            dy = 0;
-        } else if (rand < 0.75) {
-            dx = 0;
-            dy = 1;
-        } else {
-            dx = 0;
-            dy = -1;
-        }
     }
 
     // TODO Make smarter bots

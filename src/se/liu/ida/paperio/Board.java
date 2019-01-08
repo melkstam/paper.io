@@ -17,6 +17,8 @@ import java.util.*;
  */
 public class Board extends JPanel {
 
+    //TODO Add end game logic
+
     private final int areaHeight;
     private final int areaWidth;
     private Tile[][] gameArea;
@@ -287,27 +289,36 @@ public class Board extends JPanel {
      * Method responsible for main logic of the game. Checks collisions and if enclosures should be filled.
      */
     private void tick(){
-        for (Player player : players) {
-            if(player.getAlive()) {
-                player.move();
+        Player player;
+
+        for (int i = 0; i < players.size(); i++) {
+            player = players.get(i);
+
+            player.move();
+            // Kill player if player moves outside game area
+            if(player.getX() < 0 || player.getX() >= areaWidth-1 || player.getY() < 0 || player.getY() >= areaHeight -1){
+                player.die();
+            }else{
                 Tile tile = getTile(player.getX(), player.getY());
-                try {
-                    // If player is outside their owned territory, check if
-                    if (tile.getOwner() != player) {
-                        player.checkCollision(tile);
-                        player.setTileContested(tile);
-                    } else if (player.getTilesContested().size() > 0) {
-                        player.checkCollision(tile);
-                        player.contestToOwned();
-                        fillEnclosure(player);
-                    }
-                    player.setCurrentTile(tile);
-                    playerCurrentPositions.put(player, tile);
-                    findCollision();
-                } catch (ArrayIndexOutOfBoundsException ignored) {
+                player.checkCollision(tile);
+                player.setCurrentTile(tile);
+                playerCurrentPositions.put(player, tile);
+                findCollision();
+
+                // If player is outside their owned territory
+                if (tile.getOwner() != player && player.getAlive()) {
+                    player.setTileContested(tile);
+                    // If player arrives back to an owned tile
+                } else if (player.getTilesContested().size() > 0) {
+                    player.contestToOwned();
+                    fillEnclosure(player);
                 }
             }
+
         }
+
+        // Remove dead players
+        players.removeIf(p -> !p.getAlive());
 
         for(HumanPlayer humanPlayer : humanPlayers){
             humanPlayer.updateD();
@@ -358,10 +369,10 @@ public class Board extends JPanel {
         }
 
         if(player1.getTilesContested().size() > player2.getTilesContested().size()){
-            player1.death();
+            player1.die();
             System.out.println("player1 DIED");
         }else if (player1.getTilesContested().size() < player2.getTilesContested().size()){
-            player2.death();
+            player2.die();
             System.out.println("PLAYER 2 die");
         }
     }

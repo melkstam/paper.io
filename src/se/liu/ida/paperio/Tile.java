@@ -93,7 +93,6 @@ class Tile {
             this.owner.removeTileOwned(this);
         }
         this.owner = owner;
-        contestedOwner = null;
     }
 
     /**
