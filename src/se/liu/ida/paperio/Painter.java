@@ -87,13 +87,13 @@ class Painter{
         int drawX;
         int drawY;
 
-        for (int i = 0; i < board.getAreaHeight(); i++) {
-            for (int j = 0; j < board.getAreaWidth(); j++) {
+        for (int y = 0; y < board.getAreaHeight(); y++) {
+            for (int x = 0; x < board.getAreaWidth(); x++) {
                 // x and y position relative to humanPlayer at which tile should be drawn
-                drawX = (i - humanPlayer.getX()) * scale + ((width - scale) / 2)
+                drawX = (x - humanPlayer.getX()) * scale + ((width - scale) / 2)
                         + (int) ((-humanPlayer.getDx()) * scale *
                         ((board.getTickCounter() + 1) / (double) board.getTickReset()));
-                drawY = (j - humanPlayer.getY()) * scale + ((height - scale) / 2)
+                drawY = (y - humanPlayer.getY()) * scale + ((height - scale) / 2)
                         + (int) ((-humanPlayer.getDy()) * scale *
                         ((board.getTickCounter() + 1) / (double) board.getTickReset()));
 
@@ -102,7 +102,7 @@ class Painter{
                     g.setColor(Color.white);
                     g.fillRect(drawX, drawY, scale, scale);
 
-                    g.setColor(board.getTile(j,i).getColor());
+                    g.setColor(board.getTile(x,y).getColor());
                     g.fillRect(drawX, drawY, scale, scale);
                 }
             }

@@ -219,7 +219,7 @@ public class Board extends JPanel {
         int y = player.getY();
         for(int i = x-1; i <= x+1; i++){
             for(int j = y-1; j <= y+1; j++){
-                player.setTileOwned(gameArea[i][j]);
+                player.setTileOwned(getTile(i,j));
             }
         }
     }
@@ -290,20 +290,19 @@ public class Board extends JPanel {
         for (Player player : players) {
             if(player.getAlive()) {
                 player.move();
+                Tile tile = getTile(player.getX(), player.getY());
                 try {
-                    Tile tile = getTile(player.getX(), player.getY());
                     // If player is outside their owned territory, check if
-                    if (gameArea[player.getX()][player.getY()].getOwner() != player) {
-                        player.checkCollision(gameArea[player.getX()][player.getY()]);
-                        player.setTileContested(gameArea[player.getX()][player.getY()]);
-                    } else if ((gameArea[player.getX()][player.getY()].getOwner() == player)
-                            && (player.getTilesContested().size() > 0)) {
-                        player.checkCollision(gameArea[player.getX()][player.getY()]);
+                    if (tile.getOwner() != player) {
+                        player.checkCollision(tile);
+                        player.setTileContested(tile);
+                    } else if (player.getTilesContested().size() > 0) {
+                        player.checkCollision(tile);
                         player.contestToOwned();
                         fillEnclosure(player);
                     }
-                    player.setCurrentTile(gameArea[player.getX()][player.getY()]);
-                    playerCurrentPositions.put(player, gameArea[player.getX()][player.getY()]);
+                    player.setCurrentTile(tile);
+                    playerCurrentPositions.put(player, tile);
                     findCollision();
                 } catch (ArrayIndexOutOfBoundsException ignored) {
                 }
