@@ -15,6 +15,7 @@ class Painter{
     private List<Player> players;
     private Player humanPlayer;
     private Board board;
+    private boolean draw = true;
 
     /**
      * Create a new painter with scale, board which state to be drawn, player to follow and all players
@@ -31,14 +32,24 @@ class Painter{
     }
 
     /**
+     * Sets whether painter should draw or not
+     * @param draw true if painter should continue to draw, false otherwise
+     */
+    public void setDraw(boolean draw) {
+        this.draw = draw;
+    }
+
+    /**
      * Method is called from board to initialize a draw with graphics received
      * @param g graphics object used to draw
      */
      void draw(Graphics g){
-        height = g.getClipBounds().height;
-        width = g.getClipBounds().width;
-        drawGameArea(g);
-        drawPlayers(g);
+         if(draw){
+             height = g.getClipBounds().height;
+             width = g.getClipBounds().width;
+             drawGameArea(g);
+             drawPlayers(g);
+         }
     }
 
     // TODO Print name under player

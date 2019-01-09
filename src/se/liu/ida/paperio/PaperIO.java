@@ -80,7 +80,7 @@ public class PaperIO extends JFrame implements ActionListener{
                 cards.add(board, "board");
                 setState(STATE.GAME);
                 break;
-            case "pause":
+            case "End Game":
                 setState(STATE.MENU);
                 break;
         }

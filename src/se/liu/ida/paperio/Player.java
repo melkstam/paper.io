@@ -39,21 +39,6 @@ abstract class Player implements Comparable<Player> {
         this.color = color;
         this.height = height;
         this.width = width;
-
-        double rand = Math.random();
-        if (rand < 0.25) {
-            dx = 1;
-            dy = 0;
-        } else if (rand < 5) {
-            dx = -1;
-            dy = 0;
-        } else if (rand < 0.75) {
-            dx = 0;
-            dy = 1;
-        } else {
-            dx = 0;
-            dy = -1;
-        }
     }
 
     /**
