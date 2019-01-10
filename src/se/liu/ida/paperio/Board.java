@@ -22,7 +22,7 @@ public class Board extends JPanel {
     private final int areaHeight;
     private final int areaWidth;
     private Tile[][] gameArea;
-    private final int scale = 10;
+    private final int scale = 20;
 
     private int botNumber;
     private ArrayList<Player> players = new ArrayList<>();
@@ -37,6 +37,7 @@ public class Board extends JPanel {
     private ActionListener actionListener;
 
     private ArrayList<Painter> painters = new ArrayList<>();
+    private HashMap<Player, Painter> player_painter = new HashMap<>();
 
     private List<Color> colorList = new ArrayList<>(Arrays.asList(Color.magenta, Color.green, Color.red,
             Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
@@ -65,6 +66,7 @@ public class Board extends JPanel {
         initBoard();
 
         painters.add(new Painter(scale, this, humanPlayers.get(0), players));
+        player_painter.put(humanPlayers.get(0), painters.get(0));
     }
 
     /**
@@ -94,6 +96,8 @@ public class Board extends JPanel {
 
         painters.add(new Painter(scale, this, humanPlayers.get(0), players));
         painters.add(new Painter(scale, this, humanPlayers.get(1), players));
+        player_painter.put(humanPlayers.get(0), painters.get(0));
+        player_painter.put(humanPlayers.get(1), painters.get(1));
     }
 
     /**
@@ -108,6 +112,7 @@ public class Board extends JPanel {
         }
 
         specifyKeyActions();
+
         setBackground(Color.BLACK);
 
         // Adds new bots and give them a color either from colorList or randomized
@@ -257,7 +262,6 @@ public class Board extends JPanel {
         for(int i = x-3; i <= x+3; i++) {
             for (int j = y - 3; j <= y + 3; j++) {
                 if (getTile(i, j).getOwner() != null || getTile(i, j).getContestedOwner() != null ) {
-                    System.out.println("TRY AGAIN");
                     return false;
                 }
             }
@@ -288,8 +292,7 @@ public class Board extends JPanel {
         try {
             drawScoreboard(g);
 
-        } catch(IndexOutOfBoundsException e){
-
+        } catch(IndexOutOfBoundsException ignored){
         }
         Toolkit.getDefaultToolkit().sync();
     }
@@ -366,9 +369,24 @@ public class Board extends JPanel {
         // Remove dead players
         players.removeIf(p -> !p.getAlive());
 
+        boolean allKilled = true;
         for(HumanPlayer humanPlayer : humanPlayers){
             humanPlayer.updateD();
+            // Sets painter to stop drawing if humanPlayer is dead
+            player_painter.get(humanPlayer).setDraw(humanPlayer.getAlive());
+            allKilled = allKilled && !humanPlayer.getAlive();
         }
+        if(allKilled){
+            endGame();
+        }
+    }
+
+    /**
+     * Method to end game and tell this to PaperIO class
+     */
+    private void endGame(){
+        JOptionPane.showMessageDialog(this, "You lost, game over", "GAME OVER", JOptionPane.PLAIN_MESSAGE);
+        actionListener.actionPerformed(new ActionEvent(this, 0, "End Game"));
     }
 
     /**

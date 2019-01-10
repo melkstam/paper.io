@@ -130,7 +130,6 @@ class BotPlayer extends Player{
             @Override
             public void run() {
                 setAlive(true);
-                System.out.println(name + " is now Alive");
             }
         },5000);
     }
