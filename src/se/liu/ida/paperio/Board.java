@@ -366,9 +366,6 @@ public class Board extends JPanel {
         }
         respawnBots();
 
-        // Remove dead players
-        players.removeIf(p -> !p.getAlive());
-
         boolean allKilled = true;
         for(HumanPlayer humanPlayer : humanPlayers){
             humanPlayer.updateD();
@@ -379,6 +376,9 @@ public class Board extends JPanel {
         if(allKilled){
             endGame();
         }
+
+        // Remove dead players
+        players.removeIf(p -> !p.getAlive());
     }
 
     /**
