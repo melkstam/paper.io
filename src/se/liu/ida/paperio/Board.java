@@ -17,8 +17,6 @@ import java.util.*;
  */
 public class Board extends JPanel {
 
-    //TODO Add end game logic
-
     private final int areaHeight;
     private final int areaWidth;
     private Tile[][] gameArea;

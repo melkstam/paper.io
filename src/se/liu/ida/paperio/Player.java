@@ -25,8 +25,6 @@ abstract class Player implements Comparable<Player> {
 
     private Tile currentTile;
 
-    // TODO Make sure players start on a non-occupied spot
-
     /**
      * Initializes a player on a random spot on the game area with specified color
      * @param height height of game area player is constructed in
