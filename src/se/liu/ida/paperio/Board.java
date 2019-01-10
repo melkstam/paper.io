@@ -22,21 +22,21 @@ public class Board extends JPanel {
     private final int areaHeight;
     private final int areaWidth;
     private Tile[][] gameArea;
-    private final int scale = 20;
+    private final int scale = 10;
 
-    private final int botNumber;
+    private int botNumber;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<HumanPlayer> humanPlayers = new ArrayList<>();
-    private HashMap<Player, Tile> playerCurrentPositions = new HashMap<>();
+    private HashMap<Tile, Player> tilePlayerMap = new HashMap<>();
 
     private int tickCounter = 0;
     private final int tickReset;
 
+    private ArrayList<Player> deadBots = new ArrayList<>();
     private boolean paused = true;
     private ActionListener actionListener;
 
     private ArrayList<Painter> painters = new ArrayList<>();
-    private HashMap<Player, Painter> player_painter = new HashMap<>();
 
     private List<Color> colorList = new ArrayList<>(Arrays.asList(Color.magenta, Color.green, Color.red,
             Color.blue, Color.orange, Color.yellow, Color.pink, new Color(142,12,255),
@@ -65,7 +65,6 @@ public class Board extends JPanel {
         initBoard();
 
         painters.add(new Painter(scale, this, humanPlayers.get(0), players));
-        player_painter.put(humanPlayers.get(0), painters.get(0));
     }
 
     /**
@@ -95,8 +94,6 @@ public class Board extends JPanel {
 
         painters.add(new Painter(scale, this, humanPlayers.get(0), players));
         painters.add(new Painter(scale, this, humanPlayers.get(1), players));
-        player_painter.put(humanPlayers.get(0), painters.get(0));
-        player_painter.put(humanPlayers.get(1), painters.get(1));
     }
 
     /**
@@ -111,7 +108,6 @@ public class Board extends JPanel {
         }
 
         specifyKeyActions();
-
         setBackground(Color.BLACK);
 
         // Adds new bots and give them a color either from colorList or randomized
@@ -123,8 +119,23 @@ public class Board extends JPanel {
                 players.add(new BotPlayer(gameArea.length, gameArea[0].length, colorList.get(i)));
             }
         }
-        for(Player player : players){
-            startingArea(player);
+
+        // Gives each player a starting area and makes sure that they don't spawn too close to each other
+        for(int i = 0; i < players.size(); i++){
+            // If bot is too close to another bot, remove it and create a new one instead
+            if(!checkSpawn(players.get(i))){
+                players.remove(players.get(i));
+                i--;
+                if(botNumber > 9){
+                    players.add(new BotPlayer(gameArea.length,gameArea[0].length,
+                            new Color((int)(Math.random() * 0x1000000))));
+                }else {
+                    players.add(new BotPlayer(gameArea.length,gameArea[0].length, colorList.get(i)));
+                }
+                continue;
+            }else {
+                startingArea(players.get(i));
+            }
         }
 
         // Starts a timer to tick the game logic
@@ -134,6 +145,7 @@ public class Board extends JPanel {
         timer.scheduleAtFixedRate(new ScheduleTask(),
                 INITIAL_DELAY, PERIOD_INTERVAL);
     }
+
 
     /**
      * Specifies necessary key bindings and key actions for game
@@ -223,11 +235,34 @@ public class Board extends JPanel {
     private void startingArea(Player player){
         int x = player.getX();
         int y = player.getY();
+        if(!checkSpawn(player)){
+            Player playerCopy = new BotPlayer(gameArea.length,gameArea[0].length, player.getColor());
+            startingArea(playerCopy);
+        }
         for(int i = x-1; i <= x+1; i++){
             for(int j = y-1; j <= y+1; j++){
                 player.setTileOwned(getTile(i,j));
             }
         }
+    }
+
+    /**
+     * Makes sure that a player doesn't spawn on, or too close to another player. Range is set to ±9 square tiles
+     * @param player Player that you want to check surroundings for other players
+     * @return  True if nobody is close, False otherwise
+     */
+    private boolean checkSpawn(Player player){
+        int x = player.getX();
+        int y = player.getY();
+        for(int i = x-3; i <= x+3; i++) {
+            for (int j = y - 3; j <= y + 3; j++) {
+                if (getTile(i, j).getOwner() != null || getTile(i, j).getContestedOwner() != null ) {
+                    System.out.println("TRY AGAIN");
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -250,7 +285,12 @@ public class Board extends JPanel {
             //Move graphics back to top-left of window
             g.translate(-getWidth()/painters.size() * i,0);
         }
-        drawScoreboard(g);
+        try {
+            drawScoreboard(g);
+
+        } catch(IndexOutOfBoundsException e){
+
+        }
         Toolkit.getDefaultToolkit().sync();
     }
 
@@ -294,20 +334,18 @@ public class Board extends JPanel {
      */
     private void tick(){
         Player player;
-
+        tilePlayerMap.clear();
         for (int i = 0; i < players.size(); i++) {
             player = players.get(i);
-
             player.move();
             // Kill player if player moves outside game area
-            if(player.getX() < 0 || player.getX() >= areaWidth-1 || player.getY() < 0 || player.getY() >= areaHeight -1){
+            if(player.getX() < 0 || player.getX() >= areaWidth || player.getY() < 0 || player.getY() >= areaHeight){
                 player.die();
             }else{
                 Tile tile = getTile(player.getX(), player.getY());
                 player.checkCollision(tile);
                 player.setCurrentTile(tile);
-                playerCurrentPositions.put(player, tile);
-                findCollision();
+                findCollision(player, tile);
 
                 // If player is outside their owned territory
                 if (tile.getOwner() != player && player.getAlive()) {
@@ -318,82 +356,70 @@ public class Board extends JPanel {
                     fillEnclosure(player);
                 }
             }
-
+            // If BotPlayer is killed, add it to deadBots list
+            if(player instanceof BotPlayer && !player.getAlive()){
+                deadBots.add(player);
+            }
         }
+        respawnBots();
 
         // Remove dead players
         players.removeIf(p -> !p.getAlive());
 
-        boolean allKilled = true;
         for(HumanPlayer humanPlayer : humanPlayers){
             humanPlayer.updateD();
-            // Sets painter to stop drawing if humanPlayer is dead
-            player_painter.get(humanPlayer).setDraw(humanPlayer.getAlive());
-            allKilled = allKilled && !humanPlayer.getAlive();
-        }
-        if(allKilled){
-            endGame();
         }
     }
 
     /**
-     * Method to end game and tell this to PaperIO class
+     * Method that respawns dead bots after a set interval
      */
-    private void endGame(){
-        JOptionPane.showMessageDialog(this, "You lost, game over", "GAME OVER", JOptionPane.PLAIN_MESSAGE);
-        actionListener.actionPerformed(new ActionEvent(this, 0, "End Game"));
+    private void respawnBots(){
+        for(int i = 0; i < deadBots.size(); i++){
+            if(deadBots.get(i).getAlive()){
+                Player player = new BotPlayer(gameArea.length,gameArea[0].length,
+                        new Color((int)(Math.random() * 0x1000000)));
+                startingArea(player);
+                players.add(player);
+                deadBots.remove(deadBots.get(i));
+            }
+        }
     }
 
-    private void findCollision(){
-        HashMap<Tile, Player> reverseMap = new HashMap<>();
-        HashMap<Player, Tile> noDuplicateMap = new HashMap<>();
-        HashMap<Player, Tile> removedDuplicates = playerCurrentPositions;
+    /**
+     * Method that detects player-to-player head on collision
+     * @param player Player you want to check collision for
+     * @param tile   Tile that Player currently is on
+     */
+    private void findCollision(Player player, Tile tile) {
+        // If corresponding tile is found in tilePlayerMap
+        if(tilePlayerMap.containsKey(tile)) {
 
-        Tile contestedTile = new Tile(0,0);
-        Player player1 = new HumanPlayer(0,0, Color.white, "");
-        Player player2 = new HumanPlayer(0,0, Color.white, "");
-
-        // Reverses the HashMap and stores it in reverseMap.
-        for(Player p : playerCurrentPositions.keySet()){
-            for(Tile t : playerCurrentPositions.values()){
-                reverseMap.put(t,p);
+            // Iterate through all entries in tilePlayerMap, if the Tile in entry matches Tile in input,
+            // compare sizes between players and destroy one of them. The player with the largest tiles contested
+            // survives. If both players have the same amount of tiles contested, the player with the most tiles
+            // owned survives. If both players have the same amount of tiles contested and tiles owned,
+            // the first player added to Players list dies.
+            for(Map.Entry<Tile, Player> entry : tilePlayerMap.entrySet()) {
+                if (entry.getKey() == tile) {
+                    if (entry.getValue().getTilesContested().size() > player.getTilesContested().size()) {
+                        entry.getValue().die();
+                    } else if (entry.getValue().getTilesContested().size() < player.getTilesContested().size()) {
+                        player.die();
+                    } else if (entry.getValue().getTilesContested().size() == player.getTilesContested().size()) {
+                        if (entry.getValue().getTilesOwned().size() > player.getTilesOwned().size()) {
+                            entry.getValue().die();
+                        } else {
+                            player.die();
+                        }
+                    }
+                }
             }
+        }else { // If no corresponding tile is found, add tile and player to tilePlayerMap
+            tilePlayerMap.put(tile, player);
         }
-
-        // Re-reverses the HashMap back. Player that had a Tile equal to another Player will be removed.
-        // Output is stored in noDuplicateMap.
-        for(Map.Entry<Tile, Player> entry : reverseMap.entrySet()){
-            noDuplicateMap.put(entry.getValue(), entry.getKey());
-        }
-
-        // Removes all Players from playerCurrentPositions, except for the duplicate.
-        // Result is stored in removedDuplicates
-        for(Player p : noDuplicateMap.keySet()){
-            removedDuplicates.remove(p);
-        }
-
-        // Stores the Tile and Player of the remaining Entry in noDuplicateMap in
-        // player1 and contestedTile
-
-        for(Player p : noDuplicateMap.keySet()){
-            player1 = p;
-            contestedTile = p.getCurrentTile();
-        }
-
-        // Finds the Player that has the matching Tile to player1 and stores it in player2
-        for(Map.Entry<Player, Tile> entry : noDuplicateMap.entrySet()){
-            if(entry.getValue() == contestedTile){
-                player2 = entry.getKey();
-            }
-        }
-
-        if(player1.getTilesContested().size() > player2.getTilesContested().size()){
-            player1.die();
-            System.out.println("player1 DIED");
-        }else if (player1.getTilesContested().size() < player2.getTilesContested().size()){
-            player2.die();
-            System.out.println("PLAYER 2 die");
-        }
+        // Remove dead players
+        players.removeIf(p -> !p.getAlive());
     }
 
     /**
@@ -461,8 +487,8 @@ public class Board extends JPanel {
                         y = v.getY();
                         x = v.getX();
                         if(outside.contains(v) //If already declared as outside
-                        || x < minX || x > maxX || y < minY || y > maxY //If outside of boundary
-                        || x == gameArea[0].length -1 || x == 0 || y == 0 || y == gameArea.length -1){ // If it is a edge tile
+                                || x < minX || x > maxX || y < minY || y > maxY //If outside of boundary
+                                || x == gameArea[0].length -1 || x == 0 || y == 0 || y == gameArea.length -1){ // If it is a edge tile
                             cont = false;
                         }else{
                             visited.add(v);
@@ -542,7 +568,6 @@ public class Board extends JPanel {
      */
     private class ScheduleTask extends TimerTask {
 
-        // TODO Fix player collision detections
         /**
          * Gets called by timer at specified interval. Calls tick at specified rate and repaint each time
          */

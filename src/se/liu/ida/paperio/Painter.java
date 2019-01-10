@@ -52,7 +52,6 @@ class Painter{
          }
     }
 
-    // TODO Print name under player
     /**
      * Draws all players and their name on the map with corresponding color. Doesn't draw players not seen by player.
      * @param g Graphics object received as argument in paintComponent method

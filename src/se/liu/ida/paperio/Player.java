@@ -36,9 +36,35 @@ abstract class Player implements Comparable<Player> {
     Player(int height, int width, Color color){
         x = (int)(Math.random() * (width - 2) +1);
         y = (int)(Math.random() * (height - 2) +1);
+
+        if(x < 5){
+            x += 5;
+        }else if(x > (width -5)){
+            x-= 5;
+        }
+        if(y < 5){
+            y+= 5;
+        }else if(y > (height) - 5){
+            y -= 5;
+        }
         this.color = color;
         this.height = height;
         this.width = width;
+
+        double rand = Math.random();
+        if (rand < 0.25) {
+            dx = 1;
+            dy = 0;
+        } else if (rand < 5) {
+            dx = -1;
+            dy = 0;
+        } else if (rand < 0.75) {
+            dx = 0;
+            dy = 1;
+        } else {
+            dx = 0;
+            dy = -1;
+        }
     }
 
     /**
@@ -70,7 +96,7 @@ abstract class Player implements Comparable<Player> {
     abstract void move();
 
     /**
-     * Logic for when player gets killed
+     * Logic for when player gets killed. Turns all associated tiles to neutral
      */
     void die() {
         isAlive = false;
@@ -140,6 +166,7 @@ abstract class Player implements Comparable<Player> {
         return tilesContested;
     }
 
+
     /**
      * Sets contested tiles to owned by player
      */
@@ -158,14 +185,6 @@ abstract class Player implements Comparable<Player> {
         if(t.getContestedOwner() != null) {
             t.getContestedOwner().die();
         }
-    }
-
-    /**
-     * Get current tile player is on
-     * @return Tile player is on currently
-     */
-    Tile getCurrentTile() {
-        return currentTile;
     }
 
     /**
@@ -206,6 +225,14 @@ abstract class Player implements Comparable<Player> {
      */
     Boolean getAlive() {
         return isAlive;
+    }
+
+    /**
+     * Set alive state of player
+     * @param alive alive state of player
+     */
+    public void setAlive(Boolean alive) {
+        isAlive = alive;
     }
 
     /**

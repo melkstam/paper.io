@@ -85,7 +85,6 @@ public class PaperIO extends JFrame implements ActionListener{
                 break;
         }
     }
-
     public static void main(String[] args) {
         System.setProperty("sun.java2d.opengl", "True");
 
